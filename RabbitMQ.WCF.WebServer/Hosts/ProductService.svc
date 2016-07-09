@@ -1,1 +1,0 @@
-﻿<%@ ServiceHost Service="RabbitMQ.WCF.ConsoleServer.Implements.ProductService, RabbitMQ.WCF.ConsoleServer" %>

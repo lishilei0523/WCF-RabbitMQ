@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ServiceModel;
-using RabbitMQ.WCF.ConsoleServer.Implements;
+using RabbitMQ.WCF.Server.Implements;
 
-namespace RabbitMQ.WCF.ConsoleServer
+namespace RabbitMQ.WCF.ConsoleHost
 {
     class Program
     {

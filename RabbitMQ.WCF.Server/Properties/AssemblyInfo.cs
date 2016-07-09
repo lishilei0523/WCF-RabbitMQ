@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 // 有关程序集的常规信息通过以下
 // 特性集控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("RabbitMQ.WCF.Client")]
+[assembly: AssemblyTitle("RabbitMQ.WCF.Server")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("RabbitMQ.WCF.Client")]
+[assembly: AssemblyProduct("RabbitMQ.WCF.Server")]
 [assembly: AssemblyCopyright("Copyright © Microsoft 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 如果此项目向 COM 公开，则下列 GUID 用于类型库的 ID
-[assembly: Guid("6e6a8fa3-078f-411a-a695-729649fe3c0a")]
+[assembly: Guid("2e8a9e6d-61a8-4d16-8248-66a89ab30fc6")]
 
 // 程序集的版本信息由下面四个值组成: 
 //

@@ -1,7 +1,7 @@
 ﻿using System;
-using RabbitMQ.WCF.ConsoleServer.Interfaces;
+using RabbitMQ.WCF.Server.Interfaces;
 
-namespace RabbitMQ.WCF.ConsoleServer.Implements
+namespace RabbitMQ.WCF.Server.Implements
 {
     /// <summary>
     /// 商品管理服务实现
@@ -14,6 +14,7 @@ namespace RabbitMQ.WCF.ConsoleServer.Implements
         /// <returns>商品集</returns>
         public string GetProducts()
         {
+            Console.WriteLine("Hello World");
             return "Hello World";
         }
 
@@ -24,6 +25,7 @@ namespace RabbitMQ.WCF.ConsoleServer.Implements
         /// <returns>商品Id</returns>
         public Guid CreateProduct(string productName)
         {
+            Console.WriteLine(productName);
             return Guid.NewGuid();
         }
     }

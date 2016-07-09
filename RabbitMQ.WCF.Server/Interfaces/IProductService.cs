@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ServiceModel;
 
-namespace RabbitMQ.WCF.ConsoleServer.Interfaces
+namespace RabbitMQ.WCF.Server.Interfaces
 {
     /// <summary>
     /// 商品管理服务接口

@@ -82,9 +82,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RabbitMQ.WCF.ConsoleServer\RabbitMQ.WCF.ConsoleServer.csproj">
+    <ProjectReference Include="..\RabbitMQ.WCF.Server\RabbitMQ.WCF.Server.csproj">
       <Project>{6c5c3d38-7cbd-41f0-ac8f-cb47cb94fe81}</Project>
-      <Name>RabbitMQ.WCF.ConsoleServer</Name>
+      <Name>RabbitMQ.WCF.Server</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

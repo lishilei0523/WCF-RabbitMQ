@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ServiceModel;
-using RabbitMQ.WCF.ConsoleServer.Interfaces;
+using RabbitMQ.WCF.Server.Interfaces;
 
 namespace RabbitMQ.WCF.Client
 {
