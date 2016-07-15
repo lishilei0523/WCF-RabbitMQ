@@ -2,7 +2,7 @@
 using System.ServiceModel;
 using RabbitMQ.WCF.Server.Implements;
 
-namespace RabbitMQ.WCF.ConsoleHost
+namespace RabbitMQ.WCF.Server
 {
     class Program
     {
@@ -12,7 +12,7 @@ namespace RabbitMQ.WCF.ConsoleHost
             host.Open();
 
             Console.WriteLine("服务已启动...");
-            Console.ReadLine();
+            Console.ReadKey();
         }
     }
 }

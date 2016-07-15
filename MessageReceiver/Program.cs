@@ -10,31 +10,29 @@ namespace MessageReceiver
         static void Main(string[] args)
         {
             ConnectionFactory factory = new ConnectionFactory();
-            factory.HostName = "192.168.3.250";
+            factory.HostName = "192.168.3.47";
             factory.UserName = "admin";
             factory.Password = "123456";
 
-            using (var connection = factory.CreateConnection())
+            using (IConnection connection = factory.CreateConnection())
             {
-                using (var channel = connection.CreateModel())
+                using (IModel channel = connection.CreateModel())
                 {
                     channel.QueueDeclare("hello", false, false, false, null);
+                    EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
 
-                    var consumer = new QueueingBasicConsumer(channel);
-                    channel.BasicConsume("hello", true, consumer);
-
-                    Console.WriteLine(" waiting for message.");
-                    while (true)
+                    consumer.Received += (sender, e) =>
                     {
-                        var ea = (BasicDeliverEventArgs)consumer.Queue.Dequeue();
-
-                        var body = ea.Body;
-                        var message = Encoding.UTF8.GetString(body);
+                        byte[] body = e.Body;
+                        string message = Encoding.UTF8.GetString(body);
                         Console.WriteLine("Received {0}", message);
-                    }
+                    };
+
+                    channel.BasicConsume("hello", true, consumer);
+                    Console.WriteLine(" Press any key to exit.");
+                    Console.ReadLine();
                 }
             }
-            Console.ReadKey();
         }
     }
 }

@@ -9,7 +9,7 @@ namespace MessageCreator
         static void Main(string[] args)
         {
             ConnectionFactory factory = new ConnectionFactory();
-            factory.HostName = "192.168.3.250";
+            factory.HostName = "192.168.3.47";
             factory.UserName = "admin";
             factory.Password = "123456";
 
@@ -20,11 +20,10 @@ namespace MessageCreator
                     channel.QueueDeclare("hello", false, false, false, null);
                     string message = "Hello World";
                     byte[] body = Encoding.UTF8.GetBytes(message);
-                    channel.BasicPublish("", "hello", null, body);
+                    channel.BasicPublish(string.Empty, "hello", null, body);
                     Console.WriteLine(" set {0}", message);
                 }
             }
-
             Console.ReadKey();
         }
     }

@@ -8,18 +8,25 @@ namespace RabbitMQ.WCF.Client
     {
         static void Main(string[] args)
         {
-            ChannelFactory<IProductService> factory = new ChannelFactory<IProductService>(typeof(IProductService).FullName);
+            //Console.WriteLine("商品部分");
 
-            IProductService productService = factory.CreateChannel();
+            //ChannelFactory<IProductService> productSvcFactory = new ChannelFactory<IProductService>(typeof(IProductService).FullName);
+            //IProductService productService = productSvcFactory.CreateChannel();
 
-            string product = productService.GetProducts();
+            //string product = productService.GetProducts();
+            //Console.WriteLine(product);
+            //Guid newProductId = productService.CreateProduct("新商品");
+            //Console.WriteLine(newProductId);
+            //Console.WriteLine("=========================================================");
+            //Console.WriteLine();
 
-            Console.WriteLine(product);
+            Console.WriteLine("订单部分");
 
-
-            Guid newProductId = productService.CreateProduct("新商品");
-
-            Console.WriteLine(newProductId);
+            ChannelFactory<IOrderService> orderSvcFactory = new ChannelFactory<IOrderService>(typeof(IOrderService).FullName);
+            IOrderService orderService = orderSvcFactory.CreateChannel();
+            orderService.CreateOrder(Guid.NewGuid().ToString());
+            Console.WriteLine("=========================================================");
+            Console.WriteLine();
 
             Console.ReadKey();
         }
