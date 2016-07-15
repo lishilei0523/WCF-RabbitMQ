@@ -18,6 +18,7 @@ namespace MessageCreator
                 using (IModel channel = connection.CreateModel())
                 {
                     channel.QueueDeclare("hello", false, false, false, null);
+
                     string message = "Hello World";
                     byte[] body = Encoding.UTF8.GetBytes(message);
                     channel.BasicPublish(string.Empty, "hello", null, body);
