@@ -12,7 +12,7 @@ namespace RabbitMQ.WCF.Server.Interfaces
         /// 创建订单
         /// </summary>
         /// <returns>订单编号</returns>
-        [OperationContract]
+        [OperationContract(IsOneWay = true)]
         void CreateOrder(string orderNo);
     }
 }

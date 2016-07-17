@@ -10,7 +10,7 @@ namespace MessageReceiver
         static void Main(string[] args)
         {
             ConnectionFactory factory = new ConnectionFactory();
-            factory.HostName = "192.168.3.47";
+            factory.HostName = "192.168.8.210";
             factory.UserName = "admin";
             factory.Password = "123456";
 
