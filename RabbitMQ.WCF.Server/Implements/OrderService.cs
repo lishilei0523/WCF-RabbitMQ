@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using RabbitMQ.WCF.Server.Interfaces;
 
 namespace RabbitMQ.WCF.Server.Implements
@@ -14,6 +15,7 @@ namespace RabbitMQ.WCF.Server.Implements
         /// <returns>订单编号</returns>
         public void CreateOrder(string orderNo)
         {
+            Thread.Sleep(3000);
             Console.WriteLine(orderNo);
         }
     }

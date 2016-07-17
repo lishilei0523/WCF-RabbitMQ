@@ -6,10 +6,13 @@ namespace RabbitMQ.WCF.ConsoleHost
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            ServiceHost host = new ServiceHost(typeof(ProductService));
-            host.Open();
+            ServiceHost productSvcHost = new ServiceHost(typeof(ProductService));
+            ServiceHost orderSvcHost = new ServiceHost(typeof(OrderService));
+            
+            productSvcHost.Open();
+            orderSvcHost.Open();
 
             Console.WriteLine("服务已启动...");
             Console.ReadLine();

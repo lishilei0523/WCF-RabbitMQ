@@ -13,8 +13,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ.WCF.ConsoleHost", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ.WCF.Server", "RabbitMQ.WCF.Server\RabbitMQ.WCF.Server.csproj", "{6C5C3D38-7CBD-41F0-AC8F-CB47CB94FE81}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ.WCF.WebHost", "RabbitMQ.WCF.WebHost\RabbitMQ.WCF.WebHost.csproj", "{5C9CEA08-CA8D-42A2-AF08-0B21314482F6}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,10 +39,6 @@ Global
 		{6C5C3D38-7CBD-41F0-AC8F-CB47CB94FE81}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C5C3D38-7CBD-41F0-AC8F-CB47CB94FE81}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C5C3D38-7CBD-41F0-AC8F-CB47CB94FE81}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5C9CEA08-CA8D-42A2-AF08-0B21314482F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5C9CEA08-CA8D-42A2-AF08-0B21314482F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5C9CEA08-CA8D-42A2-AF08-0B21314482F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5C9CEA08-CA8D-42A2-AF08-0B21314482F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
