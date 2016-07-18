@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ServiceModel;
 using System.Threading;
 using RabbitMQ.WCF.Server.Interfaces;
 
@@ -7,6 +8,7 @@ namespace RabbitMQ.WCF.Server.Implements
     /// <summary>
     /// 订单管理服务实现
     /// </summary>
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
     public class OrderService : IOrderService
     {
         /// <summary>
@@ -15,7 +17,6 @@ namespace RabbitMQ.WCF.Server.Implements
         /// <returns>订单编号</returns>
         public void CreateOrder(string orderNo)
         {
-            Thread.Sleep(3000);
             Console.WriteLine(orderNo);
         }
     }

@@ -1,44 +1,3 @@
-// This source code is dual-licensed under the Apache License, version
-// 2.0, and the Mozilla Public License, version 1.1.
-//
-// The APL v2.0:
-//
-//---------------------------------------------------------------------------
-//   Copyright (c) 2007-2016 Pivotal Software, Inc.
-//
-//   Licensed under the Apache License, Version 2.0 (the "License");
-//   you may not use this file except in compliance with the License.
-//   You may obtain a copy of the License at
-//
-//       http://www.apache.org/licenses/LICENSE-2.0
-//
-//   Unless required by applicable law or agreed to in writing, software
-//   distributed under the License is distributed on an "AS IS" BASIS,
-//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//   See the License for the specific language governing permissions and
-//   limitations under the License.
-//---------------------------------------------------------------------------
-//
-// The MPL v1.1:
-//
-//---------------------------------------------------------------------------
-//  The contents of this file are subject to the Mozilla Public License
-//  Version 1.1 (the "License"); you may not use this file except in
-//  compliance with the License. You may obtain a copy of the License
-//  at http://www.mozilla.org/MPL/
-//
-//  Software distributed under the License is distributed on an "AS IS"
-//  basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See
-//  the License for the specific language governing rights and
-//  limitations under the License.
-//
-//  The Original Code is RabbitMQ.
-//
-//  The Initial Developer of the Original Code is Pivotal Software, Inc.
-//  Copyright (c) 2007-2016 Pivotal Software, Inc.  All rights reserved.
-//---------------------------------------------------------------------------
-
-
 //TODO: Rename to RabbitMQBinding
 namespace RabbitMQ.ServiceModel
 {
@@ -47,13 +6,17 @@ namespace RabbitMQ.ServiceModel
     using System.ServiceModel;
     using System.ServiceModel.Channels;
 
-    using RabbitMQ.Client;
+    using Client;
 
     /// <summary>
     /// A windows communication foundation binding over AMQP
     /// </summary>
+    /// <remarks>Lee 修改过可靠性会话部分，将之关闭</remarks>
     public sealed class RabbitMQBinding : Binding
     {
+        private static readonly ReliableSessionBindingElement _ReliableSessionBindingElement = new ReliableSessionBindingElement();
+
+
         private String m_host;
         private int m_port;
         private long m_maxMessageSize;
@@ -112,7 +75,7 @@ namespace RabbitMQ.ServiceModel
         /// <param name="maxMessageSize">The largest allowable encoded message size</param>
         /// <param name="protocol">The protocol version to use</param>
         public RabbitMQBinding(String hostname, int port,
-                               String username, String password,  String virtualhost,
+                               String username, String password, String virtualhost,
                                long maxMessageSize, IProtocol protocol)
             : this(protocol)
         {
@@ -122,7 +85,6 @@ namespace RabbitMQ.ServiceModel
             this.Transport.Password = password;
             this.Transport.VirtualHost = virtualhost;
             this.MaxMessageSize = maxMessageSize;
-
         }
 
         /// <summary>
@@ -157,7 +119,8 @@ namespace RabbitMQ.ServiceModel
             }
             if (!OneWayOnly)
             {
-                elements.Add(m_session);
+                /********Lee修改部分********/
+                //elements.Add(m_session);
                 elements.Add(m_compositeDuplex);
             }
             elements.Add(m_encoding);
@@ -174,7 +137,7 @@ namespace RabbitMQ.ServiceModel
                 {
                     m_transport = new RabbitMQTransportBindingElement();
                     m_encoding = new TextMessageEncodingBindingElement(); // new TextMessageEncodingBindingElement();
-                    m_session = new ReliableSessionBindingElement();
+                    m_session = new ReliableSessionBindingElement(false);
                     m_compositeDuplex = new CompositeDuplexBindingElement();
                     m_transactionFlow = new TransactionFlowBindingElement();
                     m_maxMessageSize = DefaultMaxMessageSize;

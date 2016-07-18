@@ -36,10 +36,6 @@
       <HintPath>..\packages\RabbitMQ.Client.3.6.3\lib\net45\RabbitMQ.Client.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="RabbitMQ.ServiceModel, Version=3.6.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RabbitMQ.ServiceModel.3.6.3\lib\net45\RabbitMQ.ServiceModel.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceModel" />
@@ -58,6 +54,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\RabbitMQ.ServiceModel\RabbitMQ.ServiceModel.csproj">
+      <Project>{5117232b-ee07-46f8-8af5-2b636f1dbf56}</Project>
+      <Name>RabbitMQ.ServiceModel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RabbitMQ.WCF.Server\RabbitMQ.WCF.Server.csproj">
       <Project>{6C5C3D38-7CBD-41F0-AC8F-CB47CB94FE81}</Project>
       <Name>RabbitMQ.WCF.Server</Name>

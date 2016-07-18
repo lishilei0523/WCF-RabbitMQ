@@ -1,62 +1,18 @@
-// This source code is dual-licensed under the Apache License, version
-// 2.0, and the Mozilla Public License, version 1.1.
-//
-// The APL v2.0:
-//
-//---------------------------------------------------------------------------
-//   Copyright (c) 2007-2016 Pivotal Software, Inc.
-//
-//   Licensed under the Apache License, Version 2.0 (the "License");
-//   you may not use this file except in compliance with the License.
-//   You may obtain a copy of the License at
-//
-//       http://www.apache.org/licenses/LICENSE-2.0
-//
-//   Unless required by applicable law or agreed to in writing, software
-//   distributed under the License is distributed on an "AS IS" BASIS,
-//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//   See the License for the specific language governing permissions and
-//   limitations under the License.
-//---------------------------------------------------------------------------
-//
-// The MPL v1.1:
-//
-//---------------------------------------------------------------------------
-//  The contents of this file are subject to the Mozilla Public License
-//  Version 1.1 (the "License"); you may not use this file except in
-//  compliance with the License. You may obtain a copy of the License
-//  at http://www.mozilla.org/MPL/
-//
-//  Software distributed under the License is distributed on an "AS IS"
-//  basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See
-//  the License for the specific language governing rights and
-//  limitations under the License.
-//
-//  The Original Code is RabbitMQ.
-//
-//  The Initial Developer of the Original Code is Pivotal Software, Inc.
-//  Copyright (c) 2007-2016 Pivotal Software, Inc.  All rights reserved.
-//---------------------------------------------------------------------------
-
+using System;
+using System.Configuration;
+using System.ServiceModel.Channels;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Exceptions;
 
 namespace RabbitMQ.ServiceModel
 {
-    using System;
-    using System.Configuration;
-    using System.ServiceModel;
-    using System.ServiceModel.Channels;
-
-    using RabbitMQ.Client;
-    using RabbitMQ.Client.Exceptions;
-    using System.ServiceModel.Description;
-
     /// <summary>
     /// Represents the binding element used to specify AMQP transport for transmitting messages.
     /// </summary>
     public sealed class RabbitMQTransportBindingElement : TransportBindingElement
     {
-        private ConnectionFactory m_connectionFactory;
-        private IConnection m_connection;
+        private ConnectionFactory m_connectionFactory { get; set; }
+        private IConnection m_connection { get; set; }
         private IProtocol m_protocol;
         private String m_host;
         private int m_port;
@@ -117,12 +73,14 @@ namespace RabbitMQ.ServiceModel
 
         internal void EnsureConnectionAvailable()
         {
-            if (m_connection == null) {
+            if (m_connection == null)
+            {
                 m_connection = ConnectionFactory.CreateConnection();
             }
         }
 
-        internal IModel InternalOpen() {
+        internal IModel InternalOpen()
+        {
             EnsureConnectionAvailable();
             IModel result = m_connection.CreateModel();
             m_connection.AutoClose = true;
@@ -132,11 +90,16 @@ namespace RabbitMQ.ServiceModel
         internal IModel Open(TimeSpan timeout)
         {
             // TODO: Honour timeout.
-            try {
+            try
+            {
                 return InternalOpen();
-            } catch (AlreadyClosedException) {
+            }
+            catch (AlreadyClosedException)
+            {
                 // fall through
-            } catch (ChannelAllocationException) {
+            }
+            catch (ChannelAllocationException)
+            {
                 // fall through
             }
             m_connection = null;
@@ -146,7 +109,8 @@ namespace RabbitMQ.ServiceModel
         internal void Close(IModel model, TimeSpan timeout)
         {
             // TODO: Honour timeout.
-            if (model != null) {
+            if (model != null)
+            {
                 model.Close(CurrentVersion.StatusCodes.Ok, "Goodbye");
             }
         }
@@ -170,7 +134,7 @@ namespace RabbitMQ.ServiceModel
         [ConfigurationProperty("hostname")]
         public String HostName
         {
-            get{ return m_host; }
+            get { return m_host; }
             set
             {
                 m_host = value;

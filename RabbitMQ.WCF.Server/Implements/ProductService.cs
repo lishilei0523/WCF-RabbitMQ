@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ServiceModel;
 using RabbitMQ.WCF.Server.Interfaces;
 
 namespace RabbitMQ.WCF.Server.Implements
@@ -6,6 +7,7 @@ namespace RabbitMQ.WCF.Server.Implements
     /// <summary>
     /// 商品管理服务实现
     /// </summary>
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
     public class ProductService : IProductService
     {
         /// <summary>
