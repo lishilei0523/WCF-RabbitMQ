@@ -47,7 +47,7 @@ namespace RabbitMQ.ServiceModel
     /// <summary>
     /// 
     /// </summary>
-    /// <remarks>Lee 修改过队列声明部分</remarks>
+    /// <remarks>Lee 修改过发布消息部分</remarks>
     internal sealed class RabbitMQOutputChannel : RabbitMQOutputChannelBase
     {
         /// <summary>
@@ -91,7 +91,6 @@ namespace RabbitMQ.ServiceModel
                 /********Lee修改部分********/
                 lock (_SyncLock)
                 {
-                    m_model.QueueDeclare(base.RemoteAddress.Uri.PathAndQuery, true, false, true, null);
                     m_model.BasicPublish(string.Empty, base.RemoteAddress.Uri.PathAndQuery, null, body);
                 }
             }
