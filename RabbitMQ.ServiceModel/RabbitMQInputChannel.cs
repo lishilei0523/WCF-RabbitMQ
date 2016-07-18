@@ -1,3 +1,41 @@
+#region License
+
+// This source code is dual-licensed under the Apache License, version
+// 2.0, and the Mozilla Public License, version 1.1.
+//
+// The APL v2.0:
+//
+//---------------------------------------------------------------------------
+//   Copyright (c) 2007-2016 Pivotal Software, Inc.
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+//---------------------------------------------------------------------------
+//
+// The MPL v1.1:
+//
+//---------------------------------------------------------------------------
+//  The contents of this file are subject to the Mozilla Public License
+//  Version 1.1 (the "License"); you may not use this file except in
+//  compliance with the License. You may obtain a copy of the License
+//  at http://www.mozilla.org/MPL/
+//
+//  Software distributed under the License is distributed on an "AS IS"
+//  basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See
+//  the License for the specific language governing rights and
+//  limitations under the License. 
+
+#endregion
+
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -15,11 +53,13 @@ namespace RabbitMQ.ServiceModel
     /// <remarks>Lee 修改过队列声明部分</remarks>
     internal sealed class RabbitMQInputChannel : RabbitMQInputChannelBase
     {
+        /// <summary>
+        /// 同步锁
+        /// </summary>
         private static readonly object _SyncLock = new object();
-
         private RabbitMQTransportBindingElement m_bindingElement;
         private MessageEncoder m_encoder;
-        private IModel m_model { get; set; }
+        private IModel m_model;
         private EventingBasicConsumer m_consumer;
         private BlockingCollection<BasicDeliverEventArgs> m_queue =
             new BlockingCollection<BasicDeliverEventArgs>(new ConcurrentQueue<BasicDeliverEventArgs>());
@@ -115,7 +155,7 @@ namespace RabbitMQ.ServiceModel
             /********Lee修改部分********/
             lock (_SyncLock)
             {
-                string queue = m_model.QueueDeclare(base.LocalAddress.Uri.PathAndQuery, false, false, false, null);
+                QueueDeclareOk queue = m_model.QueueDeclare(base.LocalAddress.Uri.PathAndQuery, true, false, true, null);
                 m_consumer = new EventingBasicConsumer(m_model);
                 m_consumer.Received += (sender, args) => m_queue.Add(args);
                 m_model.BasicConsume(queue, false, m_consumer);

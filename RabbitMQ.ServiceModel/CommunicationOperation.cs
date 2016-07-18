@@ -1,3 +1,5 @@
+#region License
+
 // This source code is dual-licensed under the Apache License, version
 // 2.0, and the Mozilla Public License, version 1.1.
 //
@@ -30,7 +32,10 @@
 //  Software distributed under the License is distributed on an "AS IS"
 //  basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See
 //  the License for the specific language governing rights and
-//  limitations under the License.
+//  limitations under the License. 
+
+#endregion
+
 using System;
 
 namespace RabbitMQ.ServiceModel

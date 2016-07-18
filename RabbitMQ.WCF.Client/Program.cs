@@ -38,19 +38,20 @@ namespace RabbitMQ.WCF.Client
 
             ChannelFactory<IOrderService> orderSvcFactory = new ChannelFactory<IOrderService>(typeof(IOrderService).FullName);
 
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+
             Parallel.For(0, 300, index =>
             {
-                Stopwatch watch = new Stopwatch();
-                watch.Start();
                 IOrderService orderService = orderSvcFactory.CreateChannel();
 
                 orderService.CreateOrder("编号" + index.ToString("D2"));
-
-                watch.Stop();
-                Console.WriteLine("==============================================");
-                Console.WriteLine(watch.Elapsed);
             });
 
+            watch.Stop();
+
+            Console.WriteLine("==============================================");
+            Console.WriteLine(watch.Elapsed);
             Console.ReadKey();
         }
     }
