@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.ServiceModel;
-using System.Threading;
 using System.Threading.Tasks;
 using RabbitMQ.WCF.Server.Interfaces;
 
@@ -9,7 +8,7 @@ namespace RabbitMQ.WCF.Client
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             //Console.WriteLine("商品部分");
 
@@ -41,7 +40,7 @@ namespace RabbitMQ.WCF.Client
             Stopwatch watch = new Stopwatch();
             watch.Start();
 
-            Parallel.For(0, 300, index =>
+            Parallel.For(0, 100, index =>
             {
                 IOrderService orderService = orderSvcFactory.CreateChannel();
 

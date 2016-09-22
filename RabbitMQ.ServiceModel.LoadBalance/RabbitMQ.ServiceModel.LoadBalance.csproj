@@ -10,9 +10,10 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>properties</AppDesignerFolder>
     <RootNamespace>RabbitMQ.ServiceModel</RootNamespace>
-    <AssemblyName>RabbitMQ.ServiceModel</AssemblyName>
+    <AssemblyName>RabbitMQ.ServiceModel.LoadBalance</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,8 +23,9 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\RabbitMQ.ServiceModel.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\RabbitMQ.ServiceModel.LoadBalance.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,8 +34,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\RabbitMQ.ServiceModel.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\RabbitMQ.ServiceModel.LoadBalance.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="RabbitMQ.Client, Version=3.6.3.0, Culture=neutral, PublicKeyToken=89e7d7c5feba84ce, processorArchitecture=MSIL">
@@ -42,30 +45,28 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
-    <Reference Include="System.Data" />
     <Reference Include="System.ServiceModel">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Xml" />
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommunicationOperation.cs" />
-    <Compile Include="CurrentVersion.cs" />
-    <Compile Include="Debug.cs" />
-    <Compile Include="RabbitMQBinding.cs" />
-    <Compile Include="RabbitMQBindingConfigurationElement.cs" />
-    <Compile Include="RabbitMQBindingSection.cs" />
-    <Compile Include="RabbitMQChannelBase.cs" />
-    <Compile Include="RabbitMQChannelFactory.cs" />
-    <Compile Include="RabbitMQChannelListener.cs" />
-    <Compile Include="RabbitMQChannelListenerBase.cs" />
-    <Compile Include="RabbitMQInputChannel.cs" />
-    <Compile Include="RabbitMQInputChannelBase.cs" />
-    <Compile Include="RabbitMQOutputChannel.cs" />
-    <Compile Include="RabbitMQOutputChannelBase.cs" />
-    <Compile Include="RabbitMQTransportBindingElement.cs" />
-    <Compile Include="RabbitMQTransportElement.cs" />
+    <Compile Include="Commons\CommunicationOperation.cs" />
+    <Compile Include="Commons\CurrentVersion.cs" />
+    <Compile Include="Commons\Debug.cs" />
+    <Compile Include="Bindings\RabbitMQBinding.cs" />
+    <Compile Include="Elements\RabbitMQBindingConfigurationElement.cs" />
+    <Compile Include="Bindings\RabbitMQBindingSection.cs" />
+    <Compile Include="Channels\RabbitMQChannelBase.cs" />
+    <Compile Include="Channels\RabbitMQChannelFactory.cs" />
+    <Compile Include="Channels\RabbitMQChannelListener.cs" />
+    <Compile Include="Channels\RabbitMQChannelListenerBase.cs" />
+    <Compile Include="Channels\RabbitMQInputChannel.cs" />
+    <Compile Include="Channels\RabbitMQInputChannelBase.cs" />
+    <Compile Include="Channels\RabbitMQOutputChannel.cs" />
+    <Compile Include="Channels\RabbitMQOutputChannelBase.cs" />
+    <Compile Include="Elements\RabbitMQTransportBindingElement.cs" />
+    <Compile Include="Elements\RabbitMQTransportElement.cs" />
     <Compile Include="src\serviceModel\**\*.cs" />
     <Compile Include="properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 //
 // Please edit tokenized/AssemblyInfo.cs.in.
 
-[assembly: AssemblyTitle("RabbitMQ.ServiceModel")]
-[assembly: AssemblyDescription("RabbitMQ Binding for Windows Communication Foundation")]
+[assembly: AssemblyTitle("RabbitMQ.ServiceModel.LoadBalance")]
+[assembly: AssemblyDescription("RabbitMQ Binding for Windows Communication Foundation With Load Balance.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Pivotal Software, Inc.")]
 [assembly: AssemblyProduct("RabbitMQ")]

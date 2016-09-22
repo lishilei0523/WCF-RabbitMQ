@@ -70,10 +70,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RabbitMQ.ServiceModel\RabbitMQ.ServiceModel.csproj">
-      <Project>{5117232b-ee07-46f8-8af5-2b636f1dbf56}</Project>
-      <Name>RabbitMQ.ServiceModel</Name>
-    </ProjectReference>
     <ProjectReference Include="..\RabbitMQ.Transaction.AppService\RabbitMQ.Transaction.AppService.csproj">
       <Project>{95ecae00-630f-4f58-a95a-0c22e800ac2d}</Project>
       <Name>RabbitMQ.Transaction.AppService</Name>
