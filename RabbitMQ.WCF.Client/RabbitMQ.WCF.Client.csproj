@@ -62,6 +62,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\RabbitMQ.ServiceModel.LoadBalance\RabbitMQ.ServiceModel.LoadBalance.csproj">
+      <Project>{5117232b-ee07-46f8-8af5-2b636f1dbf56}</Project>
+      <Name>RabbitMQ.ServiceModel.LoadBalance</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RabbitMQ.WCF.Server\RabbitMQ.WCF.Server.csproj">
       <Project>{6C5C3D38-7CBD-41F0-AC8F-CB47CB94FE81}</Project>
       <Name>RabbitMQ.WCF.Server</Name>

@@ -54,10 +54,6 @@
       <HintPath>..\packages\SD.IOC.Integration.WCF.1.0.3\lib\net45\SD.IOC.Integration.WCF.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ShSoft.Framework2016.Infrastructure, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ShSoft.Framework2016.Infrastructure.1.0.5\lib\net45\ShSoft.Framework2016.Infrastructure.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
