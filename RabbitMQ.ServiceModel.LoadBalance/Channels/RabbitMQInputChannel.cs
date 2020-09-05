@@ -36,14 +36,14 @@
 
 #endregion
 
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using RabbitMQ.Client.Framing;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
-using RabbitMQ.Client.Framing;
 
 namespace RabbitMQ.ServiceModel
 {
@@ -152,6 +152,7 @@ namespace RabbitMQ.ServiceModel
 #if VERBOSE
             DebugHelper.Start();
 #endif
+            //HACK
             /********LeeÐÞ¸Ä²¿·Ö********/
             lock (_SyncLock)
             {

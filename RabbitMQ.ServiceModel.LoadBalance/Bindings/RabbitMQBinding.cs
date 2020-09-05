@@ -36,11 +36,11 @@
 
 #endregion
 
+using RabbitMQ.Client;
 using System;
 using System.Configuration;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
-using RabbitMQ.Client;
 
 namespace RabbitMQ.ServiceModel
 {
@@ -152,6 +152,7 @@ namespace RabbitMQ.ServiceModel
             }
             if (!OneWayOnly)
             {
+                //HACK
                 /********LeeÐÞ¸Ä²¿·Ö********/
                 //elements.Add(m_session);
                 elements.Add(m_compositeDuplex);

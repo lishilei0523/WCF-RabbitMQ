@@ -36,11 +36,11 @@
 
 #endregion
 
+using RabbitMQ.Client;
 using System;
 using System.IO;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
-using RabbitMQ.Client;
 
 namespace RabbitMQ.ServiceModel
 {
@@ -88,6 +88,7 @@ namespace RabbitMQ.ServiceModel
                     body.Length,
                     message.Headers.Action.Remove(0, message.Headers.Action.LastIndexOf('/')));
 #endif
+                //HACK
                 /********LeeÐÞ¸Ä²¿·Ö********/
                 lock (_SyncLock)
                 {
