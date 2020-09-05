@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1231
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ.WCF.Client", "RabbitMQ.WCF.Client\RabbitMQ.WCF.Client.csproj", "{3F018398-8D8A-478F-9A4A-A450F545DAAD}"
 EndProject
@@ -26,13 +26,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00 - RabbitMQ.ServiceModel", "00 - RabbitMQ.ServiceModel", "{CBC1A320-BF4A-491A-9062-01FE7C728ACE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ.ServiceModel.LoadBalance", "RabbitMQ.ServiceModel.LoadBalance\RabbitMQ.ServiceModel.LoadBalance.csproj", "{5117232B-EE07-46F8-8AF5-2B636F1DBF56}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{39DBEC5B-DD1F-4ACC-9613-A2013A722770}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -85,5 +78,8 @@ Global
 		{95ECAE00-630F-4F58-A95A-0C22E800AC2D} = {A7E19464-3897-420F-9131-E142CE1909EB}
 		{5859D568-4DE8-4AD6-9484-6C40C44FE53E} = {A7E19464-3897-420F-9131-E142CE1909EB}
 		{5117232B-EE07-46F8-8AF5-2B636F1DBF56} = {CBC1A320-BF4A-491A-9062-01FE7C728ACE}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2473E5B5-CEAC-4C9C-B8AD-D62AECAB967A}
 	EndGlobalSection
 EndGlobal
