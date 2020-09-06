@@ -1,6 +1,6 @@
 ﻿using System.ServiceModel;
 
-namespace RabbitMQ.WCF.Server.Interfaces
+namespace RabbitMQ.WCF.Service.Interfaces
 {
     /// <summary>
     /// 订单管理服务接口

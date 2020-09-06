@@ -7,8 +7,8 @@
     <ProjectGuid>{6C5C3D38-7CBD-41F0-AC8F-CB47CB94FE81}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RabbitMQ.WCF.Server</RootNamespace>
-    <AssemblyName>RabbitMQ.WCF.Server</AssemblyName>
+    <RootNamespace>RabbitMQ.WCF.Service</RootNamespace>
+    <AssemblyName>RabbitMQ.WCF.Service</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

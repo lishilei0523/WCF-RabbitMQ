@@ -7,8 +7,8 @@
     <ProjectGuid>{58A669F2-CF6F-4B6E-B63D-CAED91363AE5}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RabbitMQ.WCF.ConsoleHost</RootNamespace>
-    <AssemblyName>RabbitMQ.WCF.ConsoleHost</AssemblyName>
+    <RootNamespace>RabbitMQ.WCF.Host</RootNamespace>
+    <AssemblyName>RabbitMQ.WCF.Host</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -38,31 +38,29 @@
     <Reference Include="RabbitMQ.Client, Version=3.6.9.0, Culture=neutral, PublicKeyToken=89e7d7c5feba84ce, processorArchitecture=MSIL">
       <HintPath>..\packages\RabbitMQ.Client.3.6.9\lib\net45\RabbitMQ.Client.dll</HintPath>
     </Reference>
+    <Reference Include="SD.RabbitMQ.ServiceModel, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SD.RabbitMQ.ServiceModel.1.0.0\lib\net45\SD.RabbitMQ.ServiceModel.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <Reference Include="Topshelf, Version=4.2.1.215, Culture=neutral, PublicKeyToken=b800c4cfcdeea87b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Topshelf.4.2.1\lib\net452\Topshelf.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceLauncher.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RabbitMQ.ServiceModel.LoadBalance\RabbitMQ.ServiceModel.LoadBalance.csproj">
-      <Project>{5117232b-ee07-46f8-8af5-2b636f1dbf56}</Project>
-      <Name>RabbitMQ.ServiceModel.LoadBalance</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RabbitMQ.WCF.Server\RabbitMQ.WCF.Server.csproj">
+    <ProjectReference Include="..\RabbitMQ.WCF.Service\RabbitMQ.WCF.Service.csproj">
       <Project>{6C5C3D38-7CBD-41F0-AC8F-CB47CB94FE81}</Project>
-      <Name>RabbitMQ.WCF.Server</Name>
+      <Name>RabbitMQ.WCF.Service</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

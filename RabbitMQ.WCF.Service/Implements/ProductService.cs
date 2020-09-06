@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ServiceModel;
-using RabbitMQ.WCF.Server.Interfaces;
+using RabbitMQ.WCF.Service.Interfaces;
 
-namespace RabbitMQ.WCF.Server.Implements
+namespace RabbitMQ.WCF.Service.Implements
 {
     /// <summary>
     /// 商品管理服务实现
