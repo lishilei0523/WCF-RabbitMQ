@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.1231
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ.WCF.Client", "RabbitMQ.WCF.Client\RabbitMQ.WCF.Client.csproj", "{3F018398-8D8A-478F-9A4A-A450F545DAAD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ.WCF.Client", "src\RabbitMQ.WCF.Client\RabbitMQ.WCF.Client.csproj", "{3F018398-8D8A-478F-9A4A-A450F545DAAD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ.WCF.Host", "RabbitMQ.WCF.Host\RabbitMQ.WCF.Host.csproj", "{58A669F2-CF6F-4B6E-B63D-CAED91363AE5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ.WCF.Host", "src\RabbitMQ.WCF.Host\RabbitMQ.WCF.Host.csproj", "{58A669F2-CF6F-4B6E-B63D-CAED91363AE5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ.WCF.Service", "RabbitMQ.WCF.Service\RabbitMQ.WCF.Service.csproj", "{6C5C3D38-7CBD-41F0-AC8F-CB47CB94FE81}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ.WCF.Service", "src\RabbitMQ.WCF.Service\RabbitMQ.WCF.Service.csproj", "{6C5C3D38-7CBD-41F0-AC8F-CB47CB94FE81}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - Server", "01 - Server", "{B0C1FE71-869C-4E2C-9EC6-89DBFEACD6AD}"
 EndProject
