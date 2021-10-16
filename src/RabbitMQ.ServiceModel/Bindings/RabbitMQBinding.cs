@@ -157,7 +157,8 @@ namespace RabbitMQ.ServiceModel
             }
             if (!OneWayOnly)
             {
-                elements.Add(m_session);
+                //TODO Powered by Lee, close ReliableSession
+                //elements.Add(m_session);
                 elements.Add(m_compositeDuplex);
             }
             elements.Add(m_encoding);

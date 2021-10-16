@@ -51,6 +51,7 @@ namespace RabbitMQ.ServiceModel
 
     internal sealed class RabbitMQOutputChannel : RabbitMQOutputChannelBase
     {
+        private static readonly object _Sync = new object();
         private RabbitMQTransportBindingElement m_bindingElement;
         private MessageEncoder m_encoder;
         private IModel m_model;
@@ -84,10 +85,14 @@ namespace RabbitMQ.ServiceModel
                     body.Length,
                     message.Headers.Action.Remove(0, message.Headers.Action.LastIndexOf('/')));
 #endif
-                m_model.BasicPublish(Exchange,
-                                   base.RemoteAddress.Uri.PathAndQuery,
-                                   null,
-                                   body);
+                //TODO Powered by Lee, add lock
+                lock (_Sync)
+                {
+                    m_model.BasicPublish(Exchange,
+                                         base.RemoteAddress.Uri.PathAndQuery,
+                                         null,
+                                         body); 
+                }
             }
         }
 
