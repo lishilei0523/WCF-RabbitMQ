@@ -47,7 +47,6 @@ namespace RabbitMQ.ServiceModel
     /// <summary>
     /// A windows communication foundation binding over AMQP
     /// </summary>
-    /// <remarks>Lee 修改过可靠性会话部分，将之关闭</remarks>
     public sealed class RabbitMQBinding : Binding
     {
         private String m_host;
@@ -152,8 +151,7 @@ namespace RabbitMQ.ServiceModel
             }
             if (!OneWayOnly)
             {
-                //HACK
-                /********Lee修改部分********/
+                //TODO Powered by Lee, close ReliableSession
                 //elements.Add(m_session);
                 elements.Add(m_compositeDuplex);
             }

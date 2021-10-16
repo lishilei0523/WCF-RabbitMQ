@@ -47,13 +47,9 @@ namespace RabbitMQ.ServiceModel
     /// <summary>
     /// 
     /// </summary>
-    /// <remarks>Lee 修改过发布消息部分</remarks>
     internal sealed class RabbitMQOutputChannel : RabbitMQOutputChannelBase
     {
-        /// <summary>
-        /// 同步锁
-        /// </summary>
-        private static readonly object _SyncLock = new object();
+        private static readonly object _Sync = new object();
         private RabbitMQTransportBindingElement m_bindingElement;
         private MessageEncoder m_encoder;
         private IModel m_model;
@@ -88,9 +84,8 @@ namespace RabbitMQ.ServiceModel
                     body.Length,
                     message.Headers.Action.Remove(0, message.Headers.Action.LastIndexOf('/')));
 #endif
-                //HACK
-                /********Lee修改部分********/
-                lock (_SyncLock)
+                //TODO Powered by Lee, add lock
+                lock (_Sync)
                 {
                     m_model.BasicPublish(string.Empty, base.RemoteAddress.Uri.PathAndQuery, null, body);
                 }

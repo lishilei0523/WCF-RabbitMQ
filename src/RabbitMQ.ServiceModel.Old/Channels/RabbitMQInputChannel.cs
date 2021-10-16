@@ -50,13 +50,9 @@ namespace RabbitMQ.ServiceModel
     /// <summary>
     /// 
     /// </summary>
-    /// <remarks>Lee 修改过队列声明部分</remarks>
     internal sealed class RabbitMQInputChannel : RabbitMQInputChannelBase
     {
-        /// <summary>
-        /// 同步锁
-        /// </summary>
-        private static readonly object _SyncLock = new object();
+        private static readonly object _Sync = new object();
         private RabbitMQTransportBindingElement m_bindingElement;
         private MessageEncoder m_encoder;
         private IModel m_model;
@@ -87,7 +83,8 @@ namespace RabbitMQ.ServiceModel
 #if VERBOSE
                 DebugHelper.Start();
 #endif
-                Message result = m_encoder.ReadMessage(new MemoryStream(msg.Body), (int)m_bindingElement.MaxReceivedMessageSize);
+                //TODO RabbitMQ.Cient 6.2.2 turn msg.Body type byte[] to ReadOnlyMemory<byte>
+                Message result = m_encoder.ReadMessage(new MemoryStream(msg.Body.ToArray()), (int)m_bindingElement.MaxReceivedMessageSize);
                 result.Headers.To = base.LocalAddress.Uri;
                 m_consumer.Model.BasicAck(msg.DeliveryTag, false);
 #if VERBOSE
@@ -134,7 +131,11 @@ namespace RabbitMQ.ServiceModel
 #endif
             if (m_consumer != null)
             {
-                m_model.BasicCancel(m_consumer.ConsumerTag);
+                //TODO RabbitMQ.Cient 6.2.2 turn ConsumerTag to ConsumerTags
+                foreach (string consumerTag in m_consumer.ConsumerTags)
+                {
+                    m_model.BasicCancel(consumerTag);
+                }
                 m_consumer = null;
             }
 #if VERBOSE
@@ -152,9 +153,8 @@ namespace RabbitMQ.ServiceModel
 #if VERBOSE
             DebugHelper.Start();
 #endif
-            //HACK
-            /********Lee修改部分********/
-            lock (_SyncLock)
+            //TODO Powered by Lee, add lock
+            lock (_Sync)
             {
                 QueueDeclareOk queue = m_model.QueueDeclare(base.LocalAddress.Uri.PathAndQuery, true, false, true, null);
                 m_consumer = new EventingBasicConsumer(m_model);
