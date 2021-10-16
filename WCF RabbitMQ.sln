@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RabbitMQ.WCF.Client", "src\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - Service", "01 - Service", "{B0C1FE71-869C-4E2C-9EC6-89DBFEACD6AD}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 - Client", "02 - Client", "{E8E8377D-71EF-4E60-86AD-EE080CE5FDDC}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03 - Client", "03 - Client", "{E8E8377D-71EF-4E60-86AD-EE080CE5FDDC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RabbitMQ.WCF.IAppService", "src\RabbitMQ.WCF.IAppService\RabbitMQ.WCF.IAppService.csproj", "{B90974B9-6938-41AF-A20A-E9C67354D139}"
 EndProject
@@ -16,6 +16,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00 - Host", "00 - Host", "{13453612-5DC4-4029-9596-FB2461003994}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RabbitMQ.WCF.AppService.Host", "src\RabbitMQ.WCF.AppService.Host\RabbitMQ.WCF.AppService.Host.csproj", "{4C48BAF3-C3A9-4D1F-B613-ABC13CAA4F73}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 - Extensions", "02 - Extensions", "{A8C31FA9-3633-446B-8BBF-ED7F74E8835F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQ.ServiceModel", "src\RabbitMQ.ServiceModel\RabbitMQ.ServiceModel.csproj", "{15FAE67E-B7DC-415F-B5CD-47B1F9529D14}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +43,10 @@ Global
 		{4C48BAF3-C3A9-4D1F-B613-ABC13CAA4F73}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C48BAF3-C3A9-4D1F-B613-ABC13CAA4F73}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C48BAF3-C3A9-4D1F-B613-ABC13CAA4F73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15FAE67E-B7DC-415F-B5CD-47B1F9529D14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15FAE67E-B7DC-415F-B5CD-47B1F9529D14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15FAE67E-B7DC-415F-B5CD-47B1F9529D14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15FAE67E-B7DC-415F-B5CD-47B1F9529D14}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +56,7 @@ Global
 		{B90974B9-6938-41AF-A20A-E9C67354D139} = {B0C1FE71-869C-4E2C-9EC6-89DBFEACD6AD}
 		{DB571814-FF5C-4700-A62D-60D1C382C3AA} = {B0C1FE71-869C-4E2C-9EC6-89DBFEACD6AD}
 		{4C48BAF3-C3A9-4D1F-B613-ABC13CAA4F73} = {13453612-5DC4-4029-9596-FB2461003994}
+		{15FAE67E-B7DC-415F-B5CD-47B1F9529D14} = {A8C31FA9-3633-446B-8BBF-ED7F74E8835F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2473E5B5-CEAC-4C9C-B8AD-D62AECAB967A}
