@@ -1,4 +1,4 @@
-﻿using RabbitMQ.WCF.Service.Interfaces;
+﻿using RabbitMQ.WCF.IAppService.Interfaces;
 using System;
 using System.Diagnostics;
 using System.ServiceModel;

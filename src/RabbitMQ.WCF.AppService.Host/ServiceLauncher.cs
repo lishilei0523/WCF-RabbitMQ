@@ -1,8 +1,8 @@
-﻿using RabbitMQ.WCF.Service.Implements;
+﻿using RabbitMQ.WCF.AppService.Implements;
 using System;
 using System.ServiceModel;
 
-namespace WCF.WindowsHost
+namespace RabbitMQ.WCF.AppService.Host
 {
     /// <summary>
     /// 服务启动器
@@ -17,8 +17,8 @@ namespace WCF.WindowsHost
         /// </summary>
         public ServiceLauncher()
         {
-            _productSvcHost = new ServiceHost(typeof(ProductService));
-            _orderSvcHost = new ServiceHost(typeof(OrderService));
+            this._productSvcHost = new ServiceHost(typeof(ProductService));
+            this._orderSvcHost = new ServiceHost(typeof(OrderService));
         }
 
         /// <summary>

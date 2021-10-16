@@ -1,7 +1,6 @@
 ﻿using Topshelf;
-using WCF.WindowsHost;
 
-namespace RabbitMQ.WCF.Host
+namespace RabbitMQ.WCF.AppService.Host
 {
     class Program
     {

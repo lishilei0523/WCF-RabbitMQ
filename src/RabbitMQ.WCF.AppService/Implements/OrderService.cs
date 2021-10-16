@@ -1,8 +1,13 @@
-﻿using RabbitMQ.WCF.Service.Interfaces;
+﻿using RabbitMQ.WCF.IAppService.Interfaces;
 using System;
+#if NET461_OR_GREATER
 using System.ServiceModel;
+#endif
+#if NETSTANDARD2_0_OR_GREATER
+using CoreWCF;
+#endif
 
-namespace RabbitMQ.WCF.Service.Implements
+namespace RabbitMQ.WCF.AppService.Implements
 {
     /// <summary>
     /// 订单管理服务实现
