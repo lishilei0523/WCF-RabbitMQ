@@ -13,6 +13,6 @@ namespace RabbitMQ.WCF.IAppService.Interfaces
         /// </summary>
         /// <returns>订单编号</returns>
         [OperationContract]
-        void CreateOrder(string orderNo);
+        string CreateOrder(string orderNo);
     }
 }

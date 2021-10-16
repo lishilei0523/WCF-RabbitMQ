@@ -19,9 +19,11 @@ namespace RabbitMQ.WCF.AppService.Implements
         /// 创建订单
         /// </summary>
         /// <returns>订单编号</returns>
-        public void CreateOrder(string orderNo)
+        public string CreateOrder(string orderNo)
         {
             Console.WriteLine(orderNo);
+
+            return orderNo;
         }
     }
 }

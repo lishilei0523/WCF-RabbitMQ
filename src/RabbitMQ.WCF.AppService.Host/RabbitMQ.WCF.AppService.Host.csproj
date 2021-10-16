@@ -12,12 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="RabbitMQ.Client" Version="6.2.2" />
     <PackageReference Include="Topshelf" Version="4.2.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RabbitMQ.ServiceModel\RabbitMQ.ServiceModel.csproj" />
+    <ProjectReference Include="..\RabbitMQ.ServiceModel.Old\RabbitMQ.ServiceModel.Old.csproj" />
     <ProjectReference Include="..\RabbitMQ.WCF.AppService\RabbitMQ.WCF.AppService.csproj" />
     <ProjectReference Include="..\RabbitMQ.WCF.IAppService\RabbitMQ.WCF.IAppService.csproj" />
   </ItemGroup>

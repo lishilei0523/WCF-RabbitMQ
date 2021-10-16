@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
+    <AssemblyName>RabbitMQ.ServiceModel</AssemblyName>
     <RootNamespace>RabbitMQ.ServiceModel</RootNamespace>
     <Authors>Lee</Authors>
     <Company>Pivotal Software, Inc.</Company>
