@@ -125,7 +125,8 @@ namespace RabbitMQ.ServiceModel
         internal IModel InternalOpen() {
             EnsureConnectionAvailable();
             IModel result = m_connection.CreateModel();
-            m_connection.AutoClose = true;
+            //TODO RabbitMQ.Cient 6.2.2 doesn't exist AutoClose property
+            //m_connection.AutoClose = true;
             return result;
         }
 
@@ -273,7 +274,8 @@ namespace RabbitMQ.ServiceModel
                 }
                 if (BrokerProtocol != null)
                 {
-                    connFactory.Protocol = BrokerProtocol;
+                    //TODO RabbitMQ.Cient 6.2.2 doesn't exist Protocol property
+                    //connFactory.Protocol = BrokerProtocol;
                 }
                 if (Username != null)
                 {

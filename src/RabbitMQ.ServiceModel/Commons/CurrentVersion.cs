@@ -41,7 +41,7 @@
 using System;
 using System.Text;
 
-using RabbitMQ.Client.Framing;
+using RabbitMQ.Client;
 
 namespace RabbitMQ.ServiceModel
 {
@@ -56,6 +56,7 @@ namespace RabbitMQ.ServiceModel
 
         internal static class StatusCodes
         {
+            //TODO RabbitMQ.Cient 6.2.2 change Constants namespace
             public const int Ok = Constants.ReplySuccess;
         }
 

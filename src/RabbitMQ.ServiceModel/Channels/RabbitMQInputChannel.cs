@@ -82,7 +82,8 @@ namespace RabbitMQ.ServiceModel
 #if VERBOSE
                 DebugHelper.Start();
 #endif
-                Message result = m_encoder.ReadMessage(new MemoryStream(msg.Body), (int)m_bindingElement.MaxReceivedMessageSize);
+                //TODO RabbitMQ.Cient 6.2.2 turn msg.Body type byte[] to ReadOnlyMemory<byte>
+                Message result = m_encoder.ReadMessage(new MemoryStream(msg.Body.ToArray()), (int)m_bindingElement.MaxReceivedMessageSize);
                 result.Headers.To = base.LocalAddress.Uri;
                 m_consumer.Model.BasicAck(msg.DeliveryTag, false);
 #if VERBOSE
@@ -128,7 +129,11 @@ namespace RabbitMQ.ServiceModel
             DebugHelper.Start();
 #endif
             if (m_consumer != null) {
-                m_model.BasicCancel(m_consumer.ConsumerTag);
+                //TODO RabbitMQ.Cient 6.2.2 turn ConsumerTag to ConsumerTags
+                foreach (string consumerTag in m_consumer.ConsumerTags)
+                {
+                    m_model.BasicCancel(consumerTag);
+                }
                 m_consumer = null;
             }
 #if VERBOSE
