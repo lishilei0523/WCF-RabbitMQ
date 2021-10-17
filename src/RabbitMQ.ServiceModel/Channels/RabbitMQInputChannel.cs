@@ -43,6 +43,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
+using System.Xml;
 
 namespace RabbitMQ.ServiceModel
 {
@@ -98,6 +99,13 @@ namespace RabbitMQ.ServiceModel
                 {
                     OnFaulted();
                 }
+
+                Close();
+                return null;
+            }
+            catch (XmlException)
+            {
+                OnFaulted();
                 Close();
                 return null;
             }

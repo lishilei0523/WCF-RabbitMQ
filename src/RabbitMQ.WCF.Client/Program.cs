@@ -10,58 +10,26 @@ namespace RabbitMQ.WCF.Client
     {
         static async Task Main()
         {
-            //Console.WriteLine("商品部分");
+            Type orderServiceType = typeof(IOrderService);
+            string endpointConfigurationName = orderServiceType.FullName;
+            ChannelFactory<IOrderService> orderServiceFactory = new ChannelFactory<IOrderService>(endpointConfigurationName);
 
-            //ChannelFactory<IProductService> productSvcFactory = new ChannelFactory<IProductService>(typeof(IProductService).FullName);
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
 
-            //Parallel.For(0, 100, index =>
-            //{
-            //    Stopwatch watch = new Stopwatch();
-            //    watch.Start();
-
-            //    IProductService productService = productSvcFactory.CreateChannel();
-
-            //    string product = productService.GetProducts();
-            //    Console.WriteLine(product);
-            //    Guid newProductId = productService.CreateProduct("新商品");
-
-            //    watch.Stop();
-
-            //    Console.WriteLine(newProductId);
-            //    Console.WriteLine("=========================================================");
-            //    Console.WriteLine(watch.Elapsed);
-            //});
-
-            //Console.ReadKey();
-
-
-            ChannelFactory<IOrderService> orderSvcFactory = new ChannelFactory<IOrderService>(typeof(IOrderService).FullName);
-
-            Stopwatch watch = new Stopwatch();
-            watch.Start();
-
-            Parallel.For(0, 10, index =>
+            for (int index = 1; index <= 1000; index++)
             {
-                IOrderService orderService = orderSvcFactory.CreateChannel();
+                IOrderService orderService = orderServiceFactory.CreateChannel();
 
-                string orderNo = $"编号{index:D3}";
-                string result = orderService.CreateOrder(orderNo);
+                string orderNo = $"编号{index:D4}";
+                string result = await Task.Run(() => orderService.CreateOrder(orderNo));
                 Console.WriteLine(result);
-            });
+            }
 
-            //for (int index = 1; index <= 100; index++)
-            //{
-            //    IOrderService orderService = orderSvcFactory.CreateChannel();
-
-            //    string orderNo = $"编号{index:D3}";
-            //    string result = await Task.Run(() => orderService.CreateOrder(orderNo));
-            //    Console.WriteLine(result);
-            //}
-
-            watch.Stop();
+            stopwatch.Stop();
 
             Console.WriteLine("==============================================");
-            Console.WriteLine(watch.Elapsed);
+            Console.WriteLine(stopwatch.Elapsed);
             Console.ReadKey();
         }
     }
