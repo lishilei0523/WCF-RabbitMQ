@@ -1,11 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFrameworks>net461;net48</TargetFrameworks>
     <AssemblyName>RabbitMQ.ServiceModel</AssemblyName>
     <RootNamespace>RabbitMQ.ServiceModel</RootNamespace>
     <Authors>Lee</Authors>
     <Company>Pivotal Software, Inc.</Company>
-    <Description>RabbitMQ Binding for Windows Communication Foundation With Load Balance. Mode by Lee.</Description>
+    <Description>
+      RabbitMQ Binding for Windows Communication Foundation.
+      Release Notes:
+        1. Remove ReliableSession to enable multiple instances;
+        2. Update RabbitMQ.Client to 6.2.2;
+    </Description>
     <Copyright>Copyright © 2007-2021 Pivotal Software, Inc.</Copyright>
   </PropertyGroup>
 
