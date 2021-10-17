@@ -100,7 +100,7 @@ namespace RabbitMQ.ServiceModel
             this._model.BasicConsume(queue, false, this._consumer);
 
 #if DEBUG
-            DebugHelper.Stop(" ## In.Channel.Open {{\n\tAddress={1}, \n\tTime={0}ms}}.", LocalAddress.Uri.PathAndQuery);
+            DebugHelper.Stop(" ## In.Channel.Open {{\n\tAddress={1}, \n\tTime={0}ms}}.", base.LocalAddress.Uri.PathAndQuery);
 #endif
             base.OnOpened();
         }
@@ -179,7 +179,7 @@ namespace RabbitMQ.ServiceModel
                 this._consumer = null;
             }
 #if DEBUG
-            DebugHelper.Stop(" ## In.Channel.Close {{\n\tAddress={1}, \n\tTime={0}ms}}.", LocalAddress.Uri.PathAndQuery);
+            DebugHelper.Stop(" ## In.Channel.Close {{\n\tAddress={1}, \n\tTime={0}ms}}.", this.LocalAddress.Uri.PathAndQuery);
 #endif
             this.OnClosed();
         }
