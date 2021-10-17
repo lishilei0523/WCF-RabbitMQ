@@ -9,7 +9,6 @@ namespace RabbitMQ.WCF.AppService.Host
     /// </summary>
     public class ServiceLauncher
     {
-        private readonly ServiceHost _productSvcHost;
         private readonly ServiceHost _orderSvcHost;
 
         /// <summary>
@@ -17,8 +16,7 @@ namespace RabbitMQ.WCF.AppService.Host
         /// </summary>
         public ServiceLauncher()
         {
-            this._productSvcHost = new ServiceHost(typeof(ProductService));
-            this._orderSvcHost = new ServiceHost(typeof(OrderService));
+            this._orderSvcHost = new ServiceHost(typeof(OrderContract));
         }
 
         /// <summary>
@@ -26,7 +24,6 @@ namespace RabbitMQ.WCF.AppService.Host
         /// </summary>
         public void Start()
         {
-            this._productSvcHost.Open();
             this._orderSvcHost.Open();
 
             Console.WriteLine("服务已启动...");
@@ -37,7 +34,6 @@ namespace RabbitMQ.WCF.AppService.Host
         /// </summary>
         public void Stop()
         {
-            this._productSvcHost.Close();
             this._orderSvcHost.Close();
 
             Console.WriteLine("服务已关闭...");

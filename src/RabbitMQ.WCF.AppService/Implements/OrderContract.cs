@@ -10,10 +10,10 @@ using CoreWCF;
 namespace RabbitMQ.WCF.AppService.Implements
 {
     /// <summary>
-    /// 订单管理服务实现
+    /// 订单管理服务契约实现
     /// </summary>
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
-    public class OrderService : IOrderService
+    public class OrderContract : IOrderContract
     {
         /// <summary>
         /// 创建订单

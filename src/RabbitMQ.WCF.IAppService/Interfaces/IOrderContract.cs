@@ -3,10 +3,10 @@
 namespace RabbitMQ.WCF.IAppService.Interfaces
 {
     /// <summary>
-    /// 订单管理服务接口
+    /// 订单管理服务契约接口
     /// </summary>
     [ServiceContract]
-    public interface IOrderService
+    public interface IOrderContract
     {
         /// <summary>
         /// 创建订单

@@ -10,19 +10,19 @@ namespace RabbitMQ.WCF.Client
     {
         static async Task Main()
         {
-            Type orderServiceType = typeof(IOrderService);
+            Type orderServiceType = typeof(IOrderContract);
             string endpointConfigurationName = orderServiceType.FullName;
-            ChannelFactory<IOrderService> orderServiceFactory = new ChannelFactory<IOrderService>(endpointConfigurationName);
+            ChannelFactory<IOrderContract> orderServiceFactory = new ChannelFactory<IOrderContract>(endpointConfigurationName);
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
             for (int index = 1; index <= 1000; index++)
             {
-                IOrderService orderService = orderServiceFactory.CreateChannel();
+                IOrderContract orderContract = orderServiceFactory.CreateChannel();
 
                 string orderNo = $"编号{index:D4}";
-                string result = await Task.Run(() => orderService.CreateOrder(orderNo));
+                string result = await Task.Run(() => orderContract.CreateOrder(orderNo));
                 Console.WriteLine(result);
             }
 
