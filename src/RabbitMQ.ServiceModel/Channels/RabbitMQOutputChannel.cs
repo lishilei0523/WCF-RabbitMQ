@@ -85,7 +85,7 @@ namespace RabbitMQ.ServiceModel
         {
             if (message.State != MessageState.Closed)
             {
-#if VERBOSE
+#if DEBUG
                 DebugHelper.Start();
 #endif
                 byte[] body;
@@ -94,7 +94,7 @@ namespace RabbitMQ.ServiceModel
                     this._encoder.WriteMessage(message, stream);
                     body = stream.ToArray();
                 }
-#if VERBOSE
+#if DEBUG
                 DebugHelper.Stop(" #### Message.Send {{\n\tAction={2}, \n\tBytes={1}, \n\tTime={0}ms}}.",
                     body.Length,
                     message.Headers.Action.Remove(0, message.Headers.Action.LastIndexOf('/')));

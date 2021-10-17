@@ -84,18 +84,18 @@ namespace RabbitMQ.ServiceModel
         protected override void OnOpen(TimeSpan timeout)
         {
 
-#if VERBOSE
+#if DEBUG
             DebugHelper.Start();
 #endif
             this._model = this._bindingElement.Open(timeout);
-#if VERBOSE
+#if DEBUG
             DebugHelper.Stop(" ## In.Open {{Time={0}ms}}.");
 #endif
         }
 
         protected override void OnClose(TimeSpan timeout)
         {
-#if VERBOSE
+#if DEBUG
             DebugHelper.Start();
 #endif
             if (this._channel != null)
@@ -109,7 +109,7 @@ namespace RabbitMQ.ServiceModel
                 base._bindingElement.Close(this._model, timeout);
                 this._model = null;
             }
-#if VERBOSE
+#if DEBUG
             DebugHelper.Stop(" ## In.Close {{Time={0}ms}}.");
 #endif
         }

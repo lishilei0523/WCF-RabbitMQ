@@ -90,7 +90,7 @@ namespace RabbitMQ.ServiceModel
             }
 
             this.OnOpening();
-#if VERBOSE
+#if DEBUG
             DebugHelper.Start();
 #endif
 
@@ -99,7 +99,7 @@ namespace RabbitMQ.ServiceModel
             this._consumer.Received += (sender, args) => this._queue.Add(args);
             this._model.BasicConsume(queue, false, this._consumer);
 
-#if VERBOSE
+#if DEBUG
             DebugHelper.Stop(" ## In.Channel.Open {{\n\tAddress={1}, \n\tTime={0}ms}}.", LocalAddress.Uri.PathAndQuery);
 #endif
             base.OnOpened();
@@ -110,7 +110,7 @@ namespace RabbitMQ.ServiceModel
             try
             {
                 BasicDeliverEventArgs message = this._queue.Take();
-#if VERBOSE
+#if DEBUG
                 DebugHelper.Start();
 #endif
                 //TODO RabbitMQ.Cient 6.2.2 turn message.Body type byte[] to ReadOnlyMemory<byte>
@@ -118,10 +118,10 @@ namespace RabbitMQ.ServiceModel
                 Message result = this._encoder.ReadMessage(stream, (int)this._bindingElement.MaxReceivedMessageSize);
                 result.Headers.To = base.LocalAddress.Uri;
                 this._consumer.Model.BasicAck(message.DeliveryTag, false);
-#if VERBOSE
+#if DEBUG
                 DebugHelper.Stop(" #### Message.Receive {{\n\tAction={2}, \n\tBytes={1}, \n\tTime={0}ms}}.",
-                        message.Body.Length,
-                        result.Headers.Action.Remove(0, result.Headers.Action.LastIndexOf('/')));
+                    message.Body.Length,
+                    result.Headers.Action.Remove(0, result.Headers.Action.LastIndexOf('/')));
 #endif
                 return result;
             }
@@ -165,7 +165,7 @@ namespace RabbitMQ.ServiceModel
             }
 
             this.OnClosing();
-#if VERBOSE
+#if DEBUG
             DebugHelper.Start();
 #endif
             if (this._consumer != null)
@@ -178,7 +178,7 @@ namespace RabbitMQ.ServiceModel
 
                 this._consumer = null;
             }
-#if VERBOSE
+#if DEBUG
             DebugHelper.Stop(" ## In.Channel.Close {{\n\tAddress={1}, \n\tTime={0}ms}}.", LocalAddress.Uri.PathAndQuery);
 #endif
             this.OnClosed();
