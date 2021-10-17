@@ -44,46 +44,72 @@ namespace RabbitMQ.ServiceModel
 {
     internal abstract class RabbitMQChannelBase : IChannel
     {
-        private readonly Action<TimeSpan> _closeMethod;
-        private readonly BindingContext _context;
+        #region Fields and Constructors
+
+        public event EventHandler Opening;
+        public event EventHandler Opened;
+        public event EventHandler Closing;
+        public event EventHandler Closed;
+        public event EventHandler Faulted;
+
         private readonly Action<TimeSpan> _openMethod;
+        private readonly Action<TimeSpan> _closeMethod;
+        private readonly BindingContext _bindingContext;
         private CommunicationState _state;
 
         private RabbitMQChannelBase()
         {
-            _state = CommunicationState.Created;
-            _closeMethod = Close;
-            _openMethod = Open;
+            this._openMethod = this.Open;
+            this._closeMethod = this.Close;
+            this._state = CommunicationState.Created;
         }
 
-        protected RabbitMQChannelBase(BindingContext context)
+        protected RabbitMQChannelBase(BindingContext bindingContext)
             : this()
         {
-            _context = context;
+            this._bindingContext = bindingContext;
         }
 
-        protected BindingContext Context
+        #endregion
+
+        #region Properties
+
+        public CommunicationState State
         {
-            get { return _context; }
+            get { return this._state; }
         }
 
-        protected String Exchange
+        protected BindingContext BindingContext
+        {
+            get { return this._bindingContext; }
+        }
+
+        protected string Exchange
         {
             get { return "amq.direct"; }
         }
+
+        #endregion
+
+        #region Methods
 
         public abstract void Close(TimeSpan timeout);
 
         public abstract void Open(TimeSpan timeout);
 
+        public virtual void Open()
+        {
+            this.Open(this._bindingContext.Binding.OpenTimeout);
+        }
+
         public virtual void Abort()
         {
-            Close();
+            this.Close();
         }
 
         public virtual void Close()
         {
-            Close(_context.Binding.CloseTimeout);
+            this.Close(this._bindingContext.Binding.CloseTimeout);
         }
 
         public virtual T GetProperty<T>() where T : class
@@ -91,56 +117,34 @@ namespace RabbitMQ.ServiceModel
             return default(T);
         }
 
-        public virtual void Open()
-        {
-            Open(_context.Binding.OpenTimeout);
-        }
-
-        public CommunicationState State
-        {
-            get { return _state; }
-        }
-
-        public event EventHandler Closed;
-
-        public event EventHandler Closing;
-
-        public event EventHandler Faulted;
-
-        public event EventHandler Opened;
-
-        public event EventHandler Opening;
-
-        #region Async Methods
-
-        public virtual IAsyncResult BeginClose(TimeSpan timeout, AsyncCallback callback, object state)
-        {
-            return _closeMethod.BeginInvoke(timeout, callback, state);
-        }
-
-        public virtual IAsyncResult BeginClose(AsyncCallback callback, object state)
-        {
-            return _closeMethod.BeginInvoke(_context.Binding.CloseTimeout, callback, state);
-        }
-
         public virtual IAsyncResult BeginOpen(TimeSpan timeout, AsyncCallback callback, object state)
         {
-            return _openMethod.BeginInvoke(timeout, callback, state);
+            return this._openMethod.BeginInvoke(timeout, callback, state);
         }
 
         public virtual IAsyncResult BeginOpen(AsyncCallback callback, object state)
         {
-            return _openMethod.BeginInvoke(_context.Binding.OpenTimeout, callback, state);
-        }
-
-        public virtual void EndClose(IAsyncResult result)
-        {
-            _closeMethod.EndInvoke(result);
+            return this._openMethod.BeginInvoke(this._bindingContext.Binding.OpenTimeout, callback, state);
         }
 
         public virtual void EndOpen(IAsyncResult result)
         {
-            _openMethod.EndInvoke(result);
+            this._openMethod.EndInvoke(result);
+        }
+
+        public virtual IAsyncResult BeginClose(TimeSpan timeout, AsyncCallback callback, object state)
+        {
+            return this._closeMethod.BeginInvoke(timeout, callback, state);
+        }
+
+        public virtual IAsyncResult BeginClose(AsyncCallback callback, object state)
+        {
+            return this._closeMethod.BeginInvoke(this._bindingContext.Binding.CloseTimeout, callback, state);
+        }
+
+        public virtual void EndClose(IAsyncResult result)
+        {
+            this._closeMethod.EndInvoke(result);
         }
 
         #endregion
@@ -149,37 +153,32 @@ namespace RabbitMQ.ServiceModel
 
         protected void OnOpening()
         {
-            _state = CommunicationState.Opening;
-            if (Opening != null)
-                Opening(this, null);
+            this._state = CommunicationState.Opening;
+            this.Opening?.Invoke(this, null);
         }
 
         protected void OnOpened()
         {
-            _state = CommunicationState.Opened;
-            if (Opened != null)
-                Opened(this, null);
+            this._state = CommunicationState.Opened;
+            this.Opened?.Invoke(this, null);
         }
 
         protected void OnClosing()
         {
-            _state = CommunicationState.Closing;
-            if (Closing != null)
-                Closing(this, null);
+            this._state = CommunicationState.Closing;
+            this.Closing?.Invoke(this, null);
         }
 
         protected void OnClosed()
         {
-            _state = CommunicationState.Closed;
-            if (Closed != null)
-                Closed(this, null);
+            this._state = CommunicationState.Closed;
+            this.Closed?.Invoke(this, null);
         }
 
         protected void OnFaulted()
         {
-            _state = CommunicationState.Faulted;
-            if (Faulted != null)
-                Faulted(this, null);
+            this._state = CommunicationState.Faulted;
+            this.Faulted?.Invoke(this, null);
         }
 
         #endregion

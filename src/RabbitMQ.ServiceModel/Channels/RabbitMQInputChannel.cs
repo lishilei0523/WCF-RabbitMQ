@@ -52,68 +52,103 @@ namespace RabbitMQ.ServiceModel
     /// </summary>
     internal sealed class RabbitMQInputChannel : RabbitMQInputChannelBase
     {
-        private RabbitMQTransportBindingElement m_bindingElement;
-        private MessageEncoder m_encoder;
-        private IModel m_model;
-        private EventingBasicConsumer m_consumer;
-        private BlockingCollection<BasicDeliverEventArgs> m_queue =
-            new BlockingCollection<BasicDeliverEventArgs>(new ConcurrentQueue<BasicDeliverEventArgs>());
+        #region Fields and Constructors
 
-        public RabbitMQInputChannel(BindingContext context, IModel model, EndpointAddress address)
-            : base(context, address)
+        private readonly RabbitMQTransportBindingElement _bindingElement;
+        private readonly IModel _model;
+        private readonly BlockingCollection<BasicDeliverEventArgs> _queue;
+        private readonly MessageEncoder _encoder;
+        private EventingBasicConsumer _consumer;
+
+        public RabbitMQInputChannel(BindingContext bindingContext, IModel model, EndpointAddress address)
+            : base(bindingContext, address)
         {
-            m_bindingElement = context.Binding.Elements.Find<RabbitMQTransportBindingElement>();
-            TextMessageEncodingBindingElement encoderElem = context.BindingParameters.Find<TextMessageEncodingBindingElement>();
-            encoderElem.ReaderQuotas.MaxStringContentLength = (int)m_bindingElement.MaxReceivedMessageSize;
-            if (encoderElem != null)
+            this._bindingElement = bindingContext.Binding.Elements.Find<RabbitMQTransportBindingElement>();
+            this._model = model;
+            this._queue = new BlockingCollection<BasicDeliverEventArgs>(new ConcurrentQueue<BasicDeliverEventArgs>());
+
+            TextMessageEncodingBindingElement encoderElement = bindingContext.BindingParameters.Find<TextMessageEncodingBindingElement>();
+            if (encoderElement != null)
             {
-                m_encoder = encoderElem.CreateMessageEncoderFactory().Encoder;
+                encoderElement.ReaderQuotas.MaxStringContentLength = (int)this._bindingElement.MaxReceivedMessageSize;
+                MessageEncoderFactory encoderFactory = encoderElement.CreateMessageEncoderFactory();
+                this._encoder = encoderFactory.Encoder;
             }
-            m_model = model;
-            m_consumer = null;
+
+            this._consumer = null;
         }
 
+        #endregion
+
+        #region Methods
+
+        public override void Open(TimeSpan timeout)
+        {
+            if (base.State != CommunicationState.Created && base.State != CommunicationState.Closed)
+            {
+                throw new InvalidOperationException($"Cannot open the channel from the {base.State} state.");
+            }
+
+            this.OnOpening();
+#if VERBOSE
+            DebugHelper.Start();
+#endif
+
+            QueueDeclareOk queue = this._model.QueueDeclare(base.LocalAddress.Uri.PathAndQuery, true, false, true, null);
+            this._consumer = new EventingBasicConsumer(this._model);
+            this._consumer.Received += (sender, args) => this._queue.Add(args);
+            this._model.BasicConsume(queue, false, this._consumer);
+
+#if VERBOSE
+            DebugHelper.Stop(" ## In.Channel.Open {{\n\tAddress={1}, \n\tTime={0}ms}}.", LocalAddress.Uri.PathAndQuery);
+#endif
+            base.OnOpened();
+        }
 
         public override Message Receive(TimeSpan timeout) //TODO: timeout isn't used
         {
             try
             {
-                BasicDeliverEventArgs msg = m_queue.Take();
+                BasicDeliverEventArgs message = this._queue.Take();
 #if VERBOSE
                 DebugHelper.Start();
 #endif
-                //TODO RabbitMQ.Cient 6.2.2 turn msg.Body type byte[] to ReadOnlyMemory<byte>
-                Message result = m_encoder.ReadMessage(new MemoryStream(msg.Body.ToArray()), (int)m_bindingElement.MaxReceivedMessageSize);
+                //TODO RabbitMQ.Cient 6.2.2 turn message.Body type byte[] to ReadOnlyMemory<byte>
+                MemoryStream stream = new MemoryStream(message.Body.ToArray());
+                Message result = this._encoder.ReadMessage(stream, (int)this._bindingElement.MaxReceivedMessageSize);
                 result.Headers.To = base.LocalAddress.Uri;
-                m_consumer.Model.BasicAck(msg.DeliveryTag, false);
+                this._consumer.Model.BasicAck(message.DeliveryTag, false);
 #if VERBOSE
                 DebugHelper.Stop(" #### Message.Receive {{\n\tAction={2}, \n\tBytes={1}, \n\tTime={0}ms}}.",
-                        msg.Body.Length,
+                        message.Body.Length,
                         result.Headers.Action.Remove(0, result.Headers.Action.LastIndexOf('/')));
 #endif
                 return result;
             }
             catch (EndOfStreamException)
             {
-                if (m_consumer == null || m_consumer.ShutdownReason != null && m_consumer.ShutdownReason.ReplyCode != Constants.ReplySuccess)
+                if (this._consumer == null || (this._consumer.ShutdownReason != null && this._consumer.ShutdownReason.ReplyCode != Constants.ReplySuccess))
                 {
-                    OnFaulted();
+                    this.OnFaulted();
                 }
 
-                Close();
+                this.Close();
+
                 return null;
             }
             catch (XmlException)
             {
-                OnFaulted();
-                Close();
+                this.OnFaulted();
+                this.Close();
+
                 return null;
             }
         }
 
         public override bool TryReceive(TimeSpan timeout, out Message message)
         {
-            message = Receive(timeout);
+            message = this.Receive(timeout);
+
             return true;
         }
 
@@ -124,49 +159,31 @@ namespace RabbitMQ.ServiceModel
 
         public override void Close(TimeSpan timeout)
         {
-
-            if (base.State == CommunicationState.Closed
-                || base.State == CommunicationState.Closing)
+            if (base.State == CommunicationState.Closed || base.State == CommunicationState.Closing)
             {
                 return; // Ignore the call, we're already closing.
             }
 
-            OnClosing();
+            this.OnClosing();
 #if VERBOSE
             DebugHelper.Start();
 #endif
-            if (m_consumer != null)
+            if (this._consumer != null)
             {
                 //TODO RabbitMQ.Cient 6.2.2 turn ConsumerTag to ConsumerTags
-                foreach (string consumerTag in m_consumer.ConsumerTags)
+                foreach (string consumerTag in this._consumer.ConsumerTags)
                 {
-                    m_model.BasicCancel(consumerTag);
+                    this._model.BasicCancel(consumerTag);
                 }
-                m_consumer = null;
+
+                this._consumer = null;
             }
 #if VERBOSE
             DebugHelper.Stop(" ## In.Channel.Close {{\n\tAddress={1}, \n\tTime={0}ms}}.", LocalAddress.Uri.PathAndQuery);
 #endif
-            OnClosed();
+            this.OnClosed();
         }
 
-        public override void Open(TimeSpan timeout)
-        {
-            if (State != CommunicationState.Created && State != CommunicationState.Closed)
-                throw new InvalidOperationException(string.Format("Cannot open the channel from the {0} state.", base.State));
-
-            OnOpening();
-#if VERBOSE
-            DebugHelper.Start();
-#endif
-            QueueDeclareOk queue = m_model.QueueDeclare(base.LocalAddress.Uri.PathAndQuery, true, false, true, null);
-            m_consumer = new EventingBasicConsumer(m_model);
-            m_consumer.Received += (sender, args) => m_queue.Add(args);
-            m_model.BasicConsume(queue, false, m_consumer);
-#if VERBOSE
-            DebugHelper.Stop(" ## In.Channel.Open {{\n\tAddress={1}, \n\tTime={0}ms}}.", LocalAddress.Uri.PathAndQuery);
-#endif
-            OnOpened();
-        }
+        #endregion
     }
 }

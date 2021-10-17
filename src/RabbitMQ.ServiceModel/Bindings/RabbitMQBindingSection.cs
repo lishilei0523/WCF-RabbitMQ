@@ -45,5 +45,6 @@ namespace RabbitMQ.ServiceModel
     /// </summary>
     public sealed class RabbitMQBindingSection : StandardBindingCollectionElement<RabbitMQBinding, RabbitMQBindingConfigurationElement>
     {
+
     }
 }

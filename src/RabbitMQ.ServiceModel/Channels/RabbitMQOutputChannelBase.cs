@@ -44,19 +44,25 @@ namespace RabbitMQ.ServiceModel
 {
     internal abstract class RabbitMQOutputChannelBase : RabbitMQChannelBase, IOutputChannel
     {
-        private readonly EndpointAddress _address;
+        #region Fields and Constructors
+
+        private readonly EndpointAddress _endpointAddress;
         private readonly Action<Message, TimeSpan> _sendMethod;
 
-        protected RabbitMQOutputChannelBase(BindingContext context, EndpointAddress address)
-            : base(context)
+        protected RabbitMQOutputChannelBase(BindingContext bindingContext, EndpointAddress endpointAddress)
+            : base(bindingContext)
         {
-            _address = address;
-            _sendMethod = Send;
+            this._endpointAddress = endpointAddress;
+            this._sendMethod = this.Send;
         }
+
+        #endregion
+
+        #region Properties
 
         public EndpointAddress RemoteAddress
         {
-            get { return _address; }
+            get { return this._endpointAddress; }
         }
 
         public Uri Via
@@ -64,26 +70,32 @@ namespace RabbitMQ.ServiceModel
             get { throw new NotImplementedException(); }
         }
 
-        public IAsyncResult BeginSend(Message message, TimeSpan timeout, AsyncCallback callback, object state)
-        {
-            return _sendMethod.BeginInvoke(message, timeout, callback, state);
-        }
+        #endregion
 
-        public IAsyncResult BeginSend(Message message, AsyncCallback callback, object state)
-        {
-            return _sendMethod.BeginInvoke(message, Context.Binding.SendTimeout, callback, state);
-        }
+        #region Methods
 
-        public void EndSend(IAsyncResult result)
+        public virtual void Send(Message message)
         {
-            _sendMethod.EndInvoke(result);
+            this.Send(message, base.BindingContext.Binding.SendTimeout);
         }
 
         public abstract void Send(Message message, TimeSpan timeout);
 
-        public virtual void Send(Message message)
+        public IAsyncResult BeginSend(Message message, AsyncCallback callback, object state)
         {
-            Send(message, Context.Binding.SendTimeout);
+            return this._sendMethod.BeginInvoke(message, base.BindingContext.Binding.SendTimeout, callback, state);
         }
+
+        public IAsyncResult BeginSend(Message message, TimeSpan timeout, AsyncCallback callback, object state)
+        {
+            return this._sendMethod.BeginInvoke(message, timeout, callback, state);
+        }
+
+        public void EndSend(IAsyncResult result)
+        {
+            this._sendMethod.EndInvoke(result);
+        }
+
+        #endregion
     }
 }

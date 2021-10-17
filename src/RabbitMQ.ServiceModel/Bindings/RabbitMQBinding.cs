@@ -36,8 +36,6 @@
 
 #endregion
 
-using RabbitMQ.Client;
-using System;
 using System.Configuration;
 using System.ServiceModel.Channels;
 
@@ -46,21 +44,17 @@ namespace RabbitMQ.ServiceModel
     /// <summary>
     /// A windows communication foundation binding over AMQP
     /// </summary>
+    /// <remarks>Mode by Lee, remove ReliableSession</remarks>
     public sealed class RabbitMQBinding : Binding
     {
-        private String m_host;
-        private int m_port;
-        private long m_maxMessageSize;
-        private IProtocol m_brokerProtocol;
-        private CompositeDuplexBindingElement m_compositeDuplex;
-        private TextMessageEncodingBindingElement m_encoding;
-        private bool m_isInitialized;
-        private bool m_oneWayOnly;
-        private TransactionFlowBindingElement m_transactionFlow;
-        private bool m_transactionsEnabled;
-        private RabbitMQTransportBindingElement m_transport;
+        #region Fields and Constructors
 
-        public static readonly long DefaultMaxMessageSize = 8192L;
+        public const long DefaultMaxMessageSize = 8192L;
+        private bool _isInitialized;
+        private TextMessageEncodingBindingElement _encoding;
+        private RabbitMQTransportBindingElement _transport;
+        private TransactionFlowBindingElement _transactionFlow;
+        private CompositeDuplexBindingElement _compositeDuplex;
 
         /// <summary>
         /// Creates a new instance of the RabbitMQBinding class initialized
@@ -68,18 +62,13 @@ namespace RabbitMQ.ServiceModel
         /// before use.
         /// </summary>
         public RabbitMQBinding()
-            : this(Protocols.DefaultProtocol)
-        { }
+        {
+            base.Name = "RabbitMQBinding";
+            base.Namespace = "http://schemas.rabbitmq.com/2007/RabbitMQ/";
 
-        /// <summary>
-        /// Uses the broker specified by the given hostname and port with
-        /// Protocols.DefaultProtocol.
-        /// </summary>
-        /// <param name="hostname">The hostname of the broker to connect to</param>
-        /// <param name="port">The port of the broker to connect to</param>
-        public RabbitMQBinding(String hostname, int port)
-            : this(hostname, port, Protocols.DefaultProtocol)
-        { }
+            this.Initialize();
+            this.TransactionFlow = true;
+        }
 
         /// <summary>
         /// Uses the broker and protocol specified
@@ -87,8 +76,8 @@ namespace RabbitMQ.ServiceModel
         /// <param name="hostname">The hostname of the broker to connect to</param>
         /// <param name="port">The port of the broker to connect to</param>
         /// <param name="protocol">The protocol version to use</param>
-        public RabbitMQBinding(String hostname, int port, IProtocol protocol)
-            : this(protocol)
+        public RabbitMQBinding(string hostname, int port)
+            : this()
         {
             this.HostName = hostname;
             this.Port = port;
@@ -103,11 +92,8 @@ namespace RabbitMQ.ServiceModel
         /// <param name="password">The broker password to connect with</param>
         /// <param name="virtualhost">The broker virtual host</param>
         /// <param name="maxMessageSize">The largest allowable encoded message size</param>
-        /// <param name="protocol">The protocol version to use</param>
-        public RabbitMQBinding(String hostname, int port,
-                               String username, String password, String virtualhost,
-                               long maxMessageSize, IProtocol protocol)
-            : this(protocol)
+        public RabbitMQBinding(string hostname, int port, string username, string password, string virtualhost, long maxMessageSize)
+            : this()
         {
             this.HostName = hostname;
             this.Port = port;
@@ -117,62 +103,9 @@ namespace RabbitMQ.ServiceModel
             this.MaxMessageSize = maxMessageSize;
         }
 
-        /// <summary>
-        /// Uses the specified protocol. The broker must be set before use.
-        /// </summary>
-        /// <param name="protocol">The protocol version to use</param>
-        public RabbitMQBinding(IProtocol protocol)
-        {
-            m_brokerProtocol = protocol;
-            base.Name = "RabbitMQBinding";
-            base.Namespace = "http://schemas.rabbitmq.com/2007/RabbitMQ/";
+        #endregion
 
-            Initialize();
-
-            this.TransactionFlow = true;
-        }
-
-        public override BindingElementCollection CreateBindingElements()
-        {
-            m_transport.HostName = this.HostName;
-            m_transport.Port = this.Port;
-            m_transport.BrokerProtocol = this.BrokerProtocol;
-            if (MaxMessageSize != DefaultMaxMessageSize)
-            {
-                m_transport.MaxReceivedMessageSize = MaxMessageSize;
-            }
-            BindingElementCollection elements = new BindingElementCollection();
-
-            if (m_transactionsEnabled)
-            {
-                elements.Add(m_transactionFlow);
-            }
-            if (!OneWayOnly)
-            {
-                //TODO Powered by Lee, remove ReliableSession
-                elements.Add(m_compositeDuplex);
-            }
-            elements.Add(m_encoding);
-            elements.Add(m_transport);
-
-            return elements;
-        }
-
-        private void Initialize()
-        {
-            lock (this)
-            {
-                if (!m_isInitialized)
-                {
-                    m_transport = new RabbitMQTransportBindingElement();
-                    m_encoding = new TextMessageEncodingBindingElement();
-                    m_compositeDuplex = new CompositeDuplexBindingElement();
-                    m_transactionFlow = new TransactionFlowBindingElement();
-                    m_maxMessageSize = DefaultMaxMessageSize;
-                    m_isInitialized = true;
-                }
-            }
-        }
+        #region Properties
 
         /// <summary>
         /// Gets the scheme used by the binding, soap.amqp
@@ -183,70 +116,87 @@ namespace RabbitMQ.ServiceModel
         }
 
         /// <summary>
-        /// Specifies the hostname of the RabbitMQ Server
-        /// </summary>
-        [ConfigurationProperty("hostname")]
-        public String HostName
-        {
-            get { return m_host; }
-            set { m_host = value; }
-        }
-
-        /// <summary>
-        /// Specifies the RabbitMQ Server port
-        /// </summary>
-        [ConfigurationProperty("port")]
-        public int Port
-        {
-            get { return m_port; }
-            set { m_port = value; }
-        }
-
-        /// <summary>
-        /// Specifies the maximum encoded message size
-        /// </summary>
-        [ConfigurationProperty("maxmessagesize")]
-        public long MaxMessageSize
-        {
-            get { return m_maxMessageSize; }
-            set { m_maxMessageSize = value; }
-        }
-
-        /// <summary>
-        /// Specifies the version of the AMQP protocol that should be used to communicate with the broker
-        /// </summary>
-        public IProtocol BrokerProtocol
-        {
-            get { return m_brokerProtocol; }
-            set { m_brokerProtocol = value; }
-        }
-
-        /// <summary>
         /// Gets the AMQP transport binding element
         /// </summary>
         public RabbitMQTransportBindingElement Transport
         {
-            get { return m_transport; }
+            get { return this._transport; }
         }
 
         /// <summary>
         /// Determines whether or not the TransactionFlowBindingElement will
         /// be added to the channel stack
         /// </summary>
-        public bool TransactionFlow
-        {
-            get { return m_transactionsEnabled; }
-            set { m_transactionsEnabled = value; }
-        }
+        public bool TransactionFlow { get; set; }
 
         /// <summary>
         /// Specifies whether or not the CompositeDuplex and ReliableSession
         /// binding elements are added to the channel stack.
         /// </summary>
-        public bool OneWayOnly
+        public bool OneWayOnly { get; set; }
+
+        /// <summary>
+        /// Specifies the hostname of the RabbitMQ Server
+        /// </summary>
+        [ConfigurationProperty("hostname")]
+        public string HostName { get; set; }
+
+        /// <summary>
+        /// Specifies the RabbitMQ Server port
+        /// </summary>
+        [ConfigurationProperty("port")]
+        public int Port { get; set; }
+
+        /// <summary>
+        /// Specifies the maximum encoded message size
+        /// </summary>
+        [ConfigurationProperty("maxmessagesize")]
+        public long MaxMessageSize { get; set; }
+
+        #endregion
+
+        #region Methods
+
+        public override BindingElementCollection CreateBindingElements()
         {
-            get { return m_oneWayOnly; }
-            set { m_oneWayOnly = value; }
+            this._transport.HostName = this.HostName;
+            this._transport.Port = this.Port;
+            if (this.MaxMessageSize != DefaultMaxMessageSize)
+            {
+                this._transport.MaxReceivedMessageSize = this.MaxMessageSize;
+            }
+            BindingElementCollection elements = new BindingElementCollection();
+
+            if (this.TransactionFlow)
+            {
+                elements.Add(this._transactionFlow);
+            }
+            if (!this.OneWayOnly)
+            {
+                elements.Add(this._compositeDuplex);
+            }
+            elements.Add(this._encoding);
+            elements.Add(this._transport);
+
+            return elements;
         }
+
+        private void Initialize()
+        {
+            lock (this)
+            {
+                if (!this._isInitialized)
+                {
+                    this._isInitialized = true;
+                    this._transport = new RabbitMQTransportBindingElement();
+                    this._encoding = new TextMessageEncodingBindingElement();
+                    this._compositeDuplex = new CompositeDuplexBindingElement();
+                    this._transactionFlow = new TransactionFlowBindingElement();
+                    this.MaxMessageSize = DefaultMaxMessageSize;
+                }
+            }
+        }
+
+        #endregion
     }
 }

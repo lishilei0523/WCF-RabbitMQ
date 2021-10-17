@@ -36,11 +36,11 @@
 
 #endregion
 
+using RabbitMQ.Client;
+using RabbitMQ.Client.Exceptions;
 using System;
 using System.Configuration;
 using System.ServiceModel.Channels;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Exceptions;
 
 namespace RabbitMQ.ServiceModel
 {
@@ -49,47 +49,177 @@ namespace RabbitMQ.ServiceModel
     /// </summary>
     public sealed class RabbitMQTransportBindingElement : TransportBindingElement
     {
-        private ConnectionFactory m_connectionFactory;
-        private IConnection m_connection;
-        private IProtocol m_protocol;
-        private String m_host;
-        private int m_port;
-        private long m_maxReceivedMessageSize;
-        private String m_username;
-        private String m_password;
-        private String m_vhost;
+        #region Fields and Constructors
+
+        private string _host;
+        private int _port;
+        private string _username;
+        private string _password;
+        private string _vhost;
+        private ConnectionFactory _connectionFactory;
+        private IConnection _connection;
 
         /// <summary>
         /// Creates a new instance of the RabbitMQTransportBindingElement Class using the default protocol.
         /// </summary>
         public RabbitMQTransportBindingElement()
         {
-            MaxReceivedMessageSize = RabbitMQBinding.DefaultMaxMessageSize;
+            this.MaxReceivedMessageSize = RabbitMQBinding.DefaultMaxMessageSize;
         }
 
-        private RabbitMQTransportBindingElement(RabbitMQTransportBindingElement other)
+        private RabbitMQTransportBindingElement(RabbitMQTransportBindingElement transportBindingElement)
         {
-            HostName = other.HostName;
-            Port = other.Port;
-            BrokerProtocol = other.BrokerProtocol;
-            Username = other.Username;
-            Password = other.Password;
-            VirtualHost = other.VirtualHost;
-            MaxReceivedMessageSize = other.MaxReceivedMessageSize;
+            this.HostName = transportBindingElement.HostName;
+            this.Port = transportBindingElement.Port;
+            this.Username = transportBindingElement.Username;
+            this.Password = transportBindingElement.Password;
+            this.VirtualHost = transportBindingElement.VirtualHost;
+            this.MaxReceivedMessageSize = transportBindingElement.MaxReceivedMessageSize;
         }
 
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Gets the scheme used by the binding, soap.amqp
+        /// </summary>
+        public override string Scheme
+        {
+            get { return CurrentVersion.Scheme; }
+        }
+
+        /// <summary>
+        /// The largest receivable encoded message
+        /// </summary>
+        public override long MaxReceivedMessageSize { get; set; }
+
+        /// <summary>
+        /// Specifies the hostname of the RabbitMQ Server
+        /// </summary>
+        [ConfigurationProperty("hostname")]
+        public string HostName
+        {
+            get { return this._host; }
+            set
+            {
+                this._host = value;
+                this._connectionFactory = null;
+            }
+        }
+
+        /// <summary>
+        /// Specifies the RabbitMQ Server port
+        /// </summary>
+        [ConfigurationProperty("port")]
+        public int Port
+        {
+            get { return this._port; }
+            set
+            {
+                this._port = value;
+                this._connectionFactory = null;
+            }
+        }
+
+        /// <summary>
+        /// The username to use when authenticating with the broker
+        /// </summary>
+        internal string Username
+        {
+            get { return this._username; }
+            set
+            {
+                this._username = value;
+                this._connectionFactory = null;
+            }
+        }
+
+        /// <summary>
+        /// Password to use when authenticating with the broker
+        /// </summary>
+        internal string Password
+        {
+            get { return this._password; }
+            set
+            {
+                this._password = value;
+                this._connectionFactory = null;
+            }
+        }
+
+        /// <summary>
+        /// Specifies the broker virtual host
+        /// </summary>
+        internal string VirtualHost
+        {
+            get { return this._vhost; }
+            set
+            {
+                this._vhost = value;
+                this._connectionFactory = null;
+            }
+        }
+
+        /// <summary>
+        /// Get the broker ConnectionFactory
+        /// </summary>
+        internal ConnectionFactory ConnectionFactory
+        {
+            get
+            {
+                if (this._connectionFactory != null)
+                {
+                    return this._connectionFactory;
+                }
+
+                ConnectionFactory connectionFactory = new ConnectionFactory();
+                if (this.HostName != null)
+                {
+                    connectionFactory.HostName = this.HostName;
+                }
+                if (this.Port != AmqpTcpEndpoint.UseDefaultPort)
+                {
+                    connectionFactory.Port = this.Port;
+                }
+                if (this.Username != null)
+                {
+                    connectionFactory.UserName = this.Username;
+                }
+                if (this.Password != null)
+                {
+                    connectionFactory.Password = this.Password;
+                }
+                if (this.VirtualHost != null)
+                {
+                    connectionFactory.VirtualHost = this.VirtualHost;
+                }
+                this._connectionFactory = connectionFactory;
+
+                return this._connectionFactory;
+            }
+        }
+
+        #endregion
+
+        #region Methods
 
         public override IChannelFactory<TChannel> BuildChannelFactory<TChannel>(BindingContext context)
         {
-            if (HostName == null)
+            if (this.HostName == null)
+            {
                 throw new InvalidOperationException("No broker was specified.");
+            }
+
             return (IChannelFactory<TChannel>)(object)new RabbitMQChannelFactory(context);
         }
 
         public override IChannelListener<TChannel> BuildChannelListener<TChannel>(BindingContext context)
         {
-            if (HostName == null)
+            if (this.HostName == null)
+            {
                 throw new InvalidOperationException("No broker was specified.");
+            }
 
             return (IChannelListener<TChannel>)((object)new RabbitMQChannelListener<TChannel>(context));
         }
@@ -104,6 +234,11 @@ namespace RabbitMQ.ServiceModel
             return typeof(TChannel) == typeof(IInputChannel);
         }
 
+        public override T GetProperty<T>(BindingContext context)
+        {
+            return context.GetInnerProperty<T>();
+        }
+
         public override BindingElement Clone()
         {
             return new RabbitMQTransportBindingElement(this);
@@ -111,19 +246,10 @@ namespace RabbitMQ.ServiceModel
 
         internal void EnsureConnectionAvailable()
         {
-            if (m_connection == null)
+            if (this._connection == null)
             {
-                m_connection = ConnectionFactory.CreateConnection();
+                this._connection = this.ConnectionFactory.CreateConnection();
             }
-        }
-
-        internal IModel InternalOpen()
-        {
-            EnsureConnectionAvailable();
-            IModel result = m_connection.CreateModel();
-            //TODO RabbitMQ.Cient 6.2.2 doesn't exist AutoClose property
-            //m_connection.AutoClose = true;
-            return result;
         }
 
         internal IModel Open(TimeSpan timeout)
@@ -131,7 +257,7 @@ namespace RabbitMQ.ServiceModel
             // TODO: Honour timeout.
             try
             {
-                return InternalOpen();
+                return this.InternalOpen();
             }
             catch (AlreadyClosedException)
             {
@@ -141,159 +267,28 @@ namespace RabbitMQ.ServiceModel
             {
                 // fall through
             }
-            m_connection = null;
-            return InternalOpen();
+
+            this._connection = null;
+            return this.InternalOpen();
+        }
+
+        internal IModel InternalOpen()
+        {
+            this.EnsureConnectionAvailable();
+            IModel model = this._connection.CreateModel();
+
+            //TODO RabbitMQ.Cient 6.2.2 doesn't exist AutoClose property
+            //this._connection.AutoClose = true;
+
+            return model;
         }
 
         internal void Close(IModel model, TimeSpan timeout)
         {
             // TODO: Honour timeout.
-            if (model != null)
-            {
-                model.Close(CurrentVersion.StatusCodes.Ok, "Goodbye");
-            }
+            model?.Close(Constants.ReplySuccess, "Goodbye");
         }
 
-        public override T GetProperty<T>(BindingContext context)
-        {
-            return context.GetInnerProperty<T>();
-        }
-
-        /// <summary>
-        /// Gets the scheme used by the binding, soap.amqp
-        /// </summary>
-        public override string Scheme
-        {
-            get { return CurrentVersion.Scheme; }
-        }
-
-        /// <summary>
-        /// Specifies the hostname of the RabbitMQ Server
-        /// </summary>
-        [ConfigurationProperty("hostname")]
-        public String HostName
-        {
-            get { return m_host; }
-            set
-            {
-                m_host = value;
-                m_connectionFactory = null;
-            }
-        }
-
-        /// <summary>
-        /// Specifies the RabbitMQ Server port
-        /// </summary>
-        [ConfigurationProperty("port")]
-        public int Port
-        {
-            get { return m_port; }
-            set
-            {
-                m_port = value;
-                m_connectionFactory = null;
-            }
-        }
-
-        /// <summary>
-        /// The largest receivable encoded message
-        /// </summary>
-        public override long MaxReceivedMessageSize
-        {
-            get { return m_maxReceivedMessageSize; }
-            set { m_maxReceivedMessageSize = value; }
-        }
-
-        /// <summary>
-        /// The username  to use when authenticating with the broker
-        /// </summary>
-        internal String Username
-        {
-            get { return m_username; }
-            set
-            {
-                m_username = value;
-                m_connectionFactory = null;
-            }
-        }
-
-        /// <summary>
-        /// Password to use when authenticating with the broker
-        /// </summary>
-        internal String Password
-        {
-            get { return m_password; }
-            set
-            {
-                m_password = value;
-                m_connectionFactory = null;
-            }
-        }
-
-        /// <summary>
-        /// Specifies the broker virtual host
-        /// </summary>
-        internal String VirtualHost
-        {
-            get { return m_vhost; }
-            set
-            {
-                m_vhost = value;
-                m_connectionFactory = null;
-            }
-        }
-
-        /// <summary>
-        /// Specifies the version of the AMQP protocol that should be used to
-        /// communicate with the broker
-        /// </summary>
-        public IProtocol BrokerProtocol
-        {
-            get { return m_protocol; }
-            set
-            {
-                m_protocol = value;
-                m_connectionFactory = null;
-            }
-        }
-
-        internal ConnectionFactory ConnectionFactory
-        {
-            get
-            {
-                if (m_connectionFactory != null)
-                {
-                    return m_connectionFactory;
-                }
-                ConnectionFactory connFactory = new ConnectionFactory();
-                if (HostName != null)
-                {
-                    connFactory.HostName = HostName;
-                }
-                if (Port != AmqpTcpEndpoint.UseDefaultPort)
-                {
-                    connFactory.Port = Port;
-                }
-                if (BrokerProtocol != null)
-                {
-                    //TODO RabbitMQ.Cient 6.2.2 doesn't exist Protocol property
-                    //connFactory.Protocol = BrokerProtocol;
-                }
-                if (Username != null)
-                {
-                    connFactory.UserName = Username;
-                }
-                if (Password != null)
-                {
-                    connFactory.Password = Password;
-                }
-                if (VirtualHost != null)
-                {
-                    connFactory.VirtualHost = VirtualHost;
-                }
-                m_connectionFactory = connFactory;
-                return connFactory;
-            }
-        }
+        #endregion
     }
 }

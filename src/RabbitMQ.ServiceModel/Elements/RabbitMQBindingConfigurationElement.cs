@@ -36,12 +36,12 @@
 
 #endregion
 
+using RabbitMQ.Client;
 using System;
 using System.Configuration;
+using System.Reflection;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Configuration;
-using System.Reflection;
-using RabbitMQ.Client;
 
 namespace RabbitMQ.ServiceModel
 {
@@ -55,6 +55,17 @@ namespace RabbitMQ.ServiceModel
     /// </remarks>
     public sealed class RabbitMQBindingConfigurationElement : StandardBindingElement
     {
+        #region Constructors
+
+        /// <summary>
+        /// Creates a new instance of the RabbitMQBindingConfigurationElement Class.
+        /// </summary>
+        public RabbitMQBindingConfigurationElement()
+            : this(null)
+        {
+
+        }
+
         /// <summary>
         /// Creates a new instance of the RabbitMQBindingConfigurationElement
         /// Class initialized with values from the specified configuration.
@@ -63,16 +74,12 @@ namespace RabbitMQ.ServiceModel
         public RabbitMQBindingConfigurationElement(string configurationName)
             : base(configurationName)
         {
+
         }
 
-        /// <summary>
-        /// Creates a new instance of the RabbitMQBindingConfigurationElement Class.
-        /// </summary>
-        public RabbitMQBindingConfigurationElement()
-            : this(null)
-        {
-        }
+        #endregion
 
+        #region Methods
 
         protected override void InitializeFrom(Binding binding)
         {
@@ -94,35 +101,60 @@ namespace RabbitMQ.ServiceModel
         protected override void OnApplyConfiguration(Binding binding)
         {
             if (binding == null)
-                throw new ArgumentNullException("binding");
-
-            RabbitMQBinding rabbind = binding as RabbitMQBinding;
-            if (rabbind == null)
             {
-                throw new ArgumentException(
-                    string.Format("Invalid type for binding. Expected {0}, Passed: {1}",
-                        typeof(RabbitMQBinding).AssemblyQualifiedName,
-                        binding.GetType().AssemblyQualifiedName));
+                throw new ArgumentNullException(nameof(binding));
+            }
+            if (!(binding is RabbitMQBinding rabbitMqBinding))
+            {
+                throw new ArgumentException($"Invalid type for binding. Expected {typeof(RabbitMQBinding).AssemblyQualifiedName}, Passed: {binding.GetType().AssemblyQualifiedName}");
             }
 
-            rabbind.HostName = this.HostName;
-            rabbind.Port = this.Port;
-            rabbind.BrokerProtocol = this.Protocol;
-            rabbind.OneWayOnly = this.OneWayOnly;
-            rabbind.TransactionFlow = this.TransactionFlowEnabled;
-            rabbind.Transport.Password = this.Password;
-            rabbind.Transport.Username = this.Username;
-            rabbind.Transport.VirtualHost = this.VirtualHost;
-            rabbind.Transport.MaxReceivedMessageSize = this.MaxMessageSize;
+            rabbitMqBinding.HostName = this.HostName;
+            rabbitMqBinding.Port = this.Port;
+            rabbitMqBinding.OneWayOnly = this.OneWayOnly;
+            rabbitMqBinding.TransactionFlow = this.TransactionFlowEnabled;
+            rabbitMqBinding.Transport.Password = this.Password;
+            rabbitMqBinding.Transport.Username = this.Username;
+            rabbitMqBinding.Transport.VirtualHost = this.VirtualHost;
+            rabbitMqBinding.Transport.MaxReceivedMessageSize = this.MaxMessageSize;
+        }
+
+        #endregion
+
+        #region Properties
+
+        protected override Type BindingElementType
+        {
+            get { return typeof(RabbitMQBinding); }
+        }
+
+        protected override ConfigurationPropertyCollection Properties
+        {
+            get
+            {
+                ConfigurationPropertyCollection configurationProperties = base.Properties;
+                Type currentType = this.GetType();
+                PropertyInfo[] publicProperties = currentType.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance);
+                foreach (PropertyInfo propertyInfo in publicProperties)
+                {
+                    object[] customAttributes = propertyInfo.GetCustomAttributes(typeof(ConfigurationPropertyAttribute), false);
+                    foreach (ConfigurationPropertyAttribute attribute in customAttributes)
+                    {
+                        configurationProperties.Add(new ConfigurationProperty(attribute.Name, propertyInfo.PropertyType, attribute.DefaultValue));
+                    }
+                }
+
+                return configurationProperties;
+            }
         }
 
         /// <summary>
         /// Specifies the hostname of the broker that the binding should connect to.
         /// </summary>
         [ConfigurationProperty("hostname", IsRequired = true)]
-        public String HostName
+        public string HostName
         {
-            get { return ((String)base["hostname"]); }
+            get { return ((string)base["hostname"]); }
             set { base["hostname"] = value; }
         }
 
@@ -187,22 +219,6 @@ namespace RabbitMQ.ServiceModel
             set { base["maxmessagesize"] = value; }
         }
 
-        private IProtocol GetProtocol()
-        {
-            return Protocols.DefaultProtocol;
-        }
-
-        /// <summary>
-        /// Gets the protocol version specified by the current configuration
-        /// </summary>
-        public IProtocol Protocol
-        {
-            get
-            {
-                return GetProtocol();
-            }
-        }
-
         /// <summary>
         /// The virtual host to access.
         /// </summary>
@@ -213,29 +229,6 @@ namespace RabbitMQ.ServiceModel
             set { base["virtualHost"] = value; }
         }
 
-        protected override System.Type BindingElementType
-        {
-            get { return typeof(RabbitMQBinding); }
-        }
-
-        protected override ConfigurationPropertyCollection Properties
-        {
-            get
-            {
-                ConfigurationPropertyCollection configProperties = base.Properties;
-                foreach (PropertyInfo prop in this.GetType().GetProperties(BindingFlags.DeclaredOnly
-                                                                           | BindingFlags.Public
-                                                                           | BindingFlags.Instance))
-                {
-                    foreach (ConfigurationPropertyAttribute attr in prop.GetCustomAttributes(typeof(ConfigurationPropertyAttribute), false))
-                    {
-                        configProperties.Add(
-                            new ConfigurationProperty(attr.Name, prop.PropertyType, attr.DefaultValue));
-                    }
-                }
-
-                return configProperties;
-            }
-        }
+        #endregion
     }
 }

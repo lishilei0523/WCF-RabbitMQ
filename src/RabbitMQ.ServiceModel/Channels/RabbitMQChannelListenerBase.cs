@@ -45,86 +45,99 @@ namespace RabbitMQ.ServiceModel
     internal abstract class RabbitMQChannelListenerBase<TChannel> : ChannelListenerBase<TChannel>
         where TChannel : class, IChannel
     {
+        #region Fields and Constructors
+
         private readonly Func<TimeSpan, TChannel> _acceptChannelMethod;
-        private readonly Action<TimeSpan> _closeMethod;
-        private readonly BindingContext _context;
-        private readonly Uri _listenUri;
-        private readonly Action<TimeSpan> _openMethod;
         private readonly Func<TimeSpan, bool> _waitForChannelMethod;
-        protected RabbitMQTransportBindingElement m_bindingElement;
+        private readonly Action<TimeSpan> _openMethod;
+        private readonly Action<TimeSpan> _closeMethod;
+        private readonly BindingContext _bindingContext;
+        private readonly Uri _listenUri;
+        protected RabbitMQTransportBindingElement _bindingElement;
 
-        protected RabbitMQChannelListenerBase(BindingContext context)
+        protected RabbitMQChannelListenerBase(BindingContext bindingContext)
         {
-            _context = context;
-            m_bindingElement = context.Binding.Elements.Find<RabbitMQTransportBindingElement>();
-            _closeMethod = OnClose;
-            _openMethod = OnOpen;
-            _waitForChannelMethod = OnWaitForChannel;
-            _acceptChannelMethod = OnAcceptChannel;
+            this._acceptChannelMethod = this.OnAcceptChannel;
+            this._waitForChannelMethod = this.OnWaitForChannel;
+            this._openMethod = this.OnOpen;
+            this._closeMethod = this.OnClose;
+            this._bindingContext = bindingContext;
+            this._bindingElement = bindingContext.Binding.Elements.Find<RabbitMQTransportBindingElement>();
 
-            if (context.ListenUriMode == ListenUriMode.Explicit && context.ListenUriBaseAddress != null)
+            if (bindingContext.ListenUriMode == ListenUriMode.Explicit && bindingContext.ListenUriBaseAddress != null)
             {
-                _listenUri = new Uri(context.ListenUriBaseAddress, context.ListenUriRelativeAddress);
+                this._listenUri = new Uri(bindingContext.ListenUriBaseAddress, bindingContext.ListenUriRelativeAddress);
             }
             else
             {
-                _listenUri = new Uri(new Uri("soap.amqp:///"), Guid.NewGuid().ToString());
+                Uri baseUri = new Uri("soap.amqp:///");
+                this._listenUri = new Uri(baseUri, Guid.NewGuid().ToString());
             }
         }
 
+        #endregion
+
+        #region Properties
+
         public override Uri Uri
         {
-            get { return _listenUri; }
+            get { return this._listenUri; }
         }
 
-        protected BindingContext Context
+        protected BindingContext BindingContext
         {
-            get { return _context; }
+            get { return this._bindingContext; }
         }
 
-        protected override void OnAbort()
-        {
-            OnClose(_context.Binding.CloseTimeout);
-        }
+        #endregion
+
+        #region Methods
 
         protected override IAsyncResult OnBeginAcceptChannel(TimeSpan timeout, AsyncCallback callback, object state)
         {
-            return _acceptChannelMethod.BeginInvoke(timeout, callback, state);
+            return this._acceptChannelMethod.BeginInvoke(timeout, callback, state);
         }
 
         protected override TChannel OnEndAcceptChannel(IAsyncResult result)
         {
-            return _acceptChannelMethod.EndInvoke(result);
+            return this._acceptChannelMethod.EndInvoke(result);
         }
 
         protected override IAsyncResult OnBeginWaitForChannel(TimeSpan timeout, AsyncCallback callback, object state)
         {
-            return _waitForChannelMethod.BeginInvoke(timeout, callback, state);
+            return this._waitForChannelMethod.BeginInvoke(timeout, callback, state);
         }
 
         protected override bool OnEndWaitForChannel(IAsyncResult result)
         {
-            return _waitForChannelMethod.EndInvoke(result);
-        }
-
-        protected override IAsyncResult OnBeginClose(TimeSpan timeout, AsyncCallback callback, object state)
-        {
-            return _closeMethod.BeginInvoke(timeout, callback, state);
+            return this._waitForChannelMethod.EndInvoke(result);
         }
 
         protected override IAsyncResult OnBeginOpen(TimeSpan timeout, AsyncCallback callback, object state)
         {
-            return _openMethod.BeginInvoke(timeout, callback, state);
-        }
-
-        protected override void OnEndClose(IAsyncResult result)
-        {
-            _closeMethod.EndInvoke(result);
+            return this._openMethod.BeginInvoke(timeout, callback, state);
         }
 
         protected override void OnEndOpen(IAsyncResult result)
         {
-            _openMethod.EndInvoke(result);
+            this._openMethod.EndInvoke(result);
         }
+
+        protected override IAsyncResult OnBeginClose(TimeSpan timeout, AsyncCallback callback, object state)
+        {
+            return this._closeMethod.BeginInvoke(timeout, callback, state);
+        }
+
+        protected override void OnEndClose(IAsyncResult result)
+        {
+            this._closeMethod.EndInvoke(result);
+        }
+
+        protected override void OnAbort()
+        {
+            this.OnClose(this._bindingContext.Binding.CloseTimeout);
+        }
+
+        #endregion
     }
 }

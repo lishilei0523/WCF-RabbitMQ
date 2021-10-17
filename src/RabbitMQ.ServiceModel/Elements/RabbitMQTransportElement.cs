@@ -36,102 +36,26 @@
 
 #endregion
 
+using RabbitMQ.Client;
 using System;
 using System.Configuration;
 using System.Reflection;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Configuration;
-using RabbitMQ.Client;
 
 namespace RabbitMQ.ServiceModel
 {
     public sealed class RabbitMQTransportElement : TransportElement
     {
-
-        public override void ApplyConfiguration(BindingElement bindingElement)
-        {
-            base.ApplyConfiguration(bindingElement);
-            if (bindingElement == null)
-                throw new ArgumentNullException("binding");
-
-            RabbitMQTransportBindingElement rabbind = bindingElement as RabbitMQTransportBindingElement;
-            if (rabbind == null)
-            {
-                throw new ArgumentException(
-                    string.Format("Invalid type for binding. Expected {0}, Passed: {1}",
-                        typeof(RabbitMQBinding).AssemblyQualifiedName,
-                        bindingElement.GetType().AssemblyQualifiedName));
-            }
-
-            rabbind.HostName = this.HostName;
-            rabbind.Port = this.Port;
-            rabbind.BrokerProtocol = this.Protocol;
-            rabbind.ConnectionFactory.Password = this.Password;
-            rabbind.ConnectionFactory.UserName = this.Username;
-            rabbind.ConnectionFactory.VirtualHost = this.VirtualHost;
-        }
-
-        public override void CopyFrom(ServiceModelExtensionElement from)
-        {
-            base.CopyFrom(from);
-            RabbitMQTransportElement element = from as RabbitMQTransportElement;
-            if (element != null)
-            {
-                this.HostName = element.HostName;
-                this.Port = element.Port;
-                this.Password = element.Password;
-                this.Username = element.Username;
-                this.VirtualHost = element.VirtualHost;
-            }
-        }
-
-        protected override BindingElement CreateBindingElement()
-        {
-            TransportBindingElement element = CreateDefaultBindingElement();
-            this.ApplyConfiguration(element);
-            return element;
-        }
-
-        protected override System.ServiceModel.Channels.TransportBindingElement CreateDefaultBindingElement()
-        {
-            return new RabbitMQTransportBindingElement();
-        }
-
-        protected override void InitializeFrom(System.ServiceModel.Channels.BindingElement bindingElement)
-        {
-            base.InitializeFrom(bindingElement);
-
-            if (bindingElement == null)
-                throw new ArgumentNullException("binding");
-
-            RabbitMQTransportBindingElement rabbind = bindingElement as RabbitMQTransportBindingElement;
-            if (rabbind == null)
-            {
-                throw new ArgumentException(
-                    string.Format("Invalid type for binding. Expected {0}, Passed: {1}",
-                        typeof(RabbitMQBinding).AssemblyQualifiedName,
-                        bindingElement.GetType().AssemblyQualifiedName));
-            }
-
-            this.HostName = rabbind.HostName;
-            this.Port = rabbind.Port;
-            this.Password = rabbind.ConnectionFactory.Password;
-            this.Username = rabbind.ConnectionFactory.UserName;
-            this.VirtualHost = rabbind.ConnectionFactory.VirtualHost;
-        }
-
-        public override System.Type BindingElementType
-        {
-            get { return typeof(RabbitMQTransportElement); }
-        }
+        #region Properties
 
         /// <summary>
         /// Specifies the hostname of the broker that the binding should connect to.
         /// </summary>
         [ConfigurationProperty("hostname", IsRequired = true)]
-        public String HostName
+        public string HostName
         {
-            get { return ((String)base["hostname"]); }
+            get { return ((string)base["hostname"]); }
             set { base["hostname"] = value; }
         }
 
@@ -146,17 +70,7 @@ namespace RabbitMQ.ServiceModel
         }
 
         /// <summary>
-        /// Password to use when authenticating with the broker
-        /// </summary>
-        [ConfigurationProperty("password", DefaultValue = ConnectionFactory.DefaultPass)]
-        public string Password
-        {
-            get { return ((string)base["password"]); }
-            set { base["password"] = value; }
-        }
-
-        /// <summary>
-        /// The username  to use when authenticating with the broker
+        /// The username to use when authenticating with the broker
         /// </summary>
         [ConfigurationProperty("username", DefaultValue = ConnectionFactory.DefaultUser)]
         public string Username
@@ -165,15 +79,15 @@ namespace RabbitMQ.ServiceModel
             set { base["username"] = value; }
         }
 
-        private IProtocol GetProtocol()
-        {
-            return Protocols.DefaultProtocol;
-        }
-
         /// <summary>
-        /// Gets the protocol version specified by the current configuration
+        /// Password to use when authenticating with the broker
         /// </summary>
-        public IProtocol Protocol { get { return GetProtocol(); } }
+        [ConfigurationProperty("password", DefaultValue = ConnectionFactory.DefaultPass)]
+        public string Password
+        {
+            get { return ((string)base["password"]); }
+            set { base["password"] = value; }
+        }
 
         /// <summary>
         /// The virtual host to access.
@@ -185,33 +99,100 @@ namespace RabbitMQ.ServiceModel
             set { base["virtualHost"] = value; }
         }
 
-        /// <summary>
-        /// The largest receivable encoded message
-        /// </summary>
-        public new long MaxReceivedMessageSize
+        public override Type BindingElementType
         {
-            get { return MaxReceivedMessageSize; }
-            set { MaxReceivedMessageSize = value; }
+            get { return typeof(RabbitMQTransportElement); }
         }
 
         protected override ConfigurationPropertyCollection Properties
         {
             get
             {
-                ConfigurationPropertyCollection configProperties = base.Properties;
-                foreach (PropertyInfo prop in this.GetType().GetProperties(BindingFlags.DeclaredOnly
-                                                                           | BindingFlags.Public
-                                                                           | BindingFlags.Instance))
+                ConfigurationPropertyCollection configurationProperties = base.Properties;
+                Type currentType = this.GetType();
+                PropertyInfo[] publicProperties = currentType.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance);
+                foreach (PropertyInfo propertyInfo in publicProperties)
                 {
-                    foreach (ConfigurationPropertyAttribute attr in prop.GetCustomAttributes(typeof(ConfigurationPropertyAttribute), false))
+                    object[] customAttributes = propertyInfo.GetCustomAttributes(typeof(ConfigurationPropertyAttribute), false);
+                    foreach (ConfigurationPropertyAttribute attribute in customAttributes)
                     {
-                        configProperties.Add(
-                            new ConfigurationProperty(attr.Name, prop.PropertyType, attr.DefaultValue));
+                        configurationProperties.Add(new ConfigurationProperty(attribute.Name, propertyInfo.PropertyType, attribute.DefaultValue));
                     }
                 }
 
-                return configProperties;
+                return configurationProperties;
             }
         }
+
+        #endregion
+
+        #region Methods
+
+        public override void ApplyConfiguration(BindingElement bindingElement)
+        {
+            base.ApplyConfiguration(bindingElement);
+            if (bindingElement == null)
+            {
+                throw new ArgumentNullException(nameof(bindingElement));
+            }
+            if (!(bindingElement is RabbitMQTransportBindingElement rabbitMqTransportBindingElement))
+            {
+                throw new ArgumentException($"Invalid type for binding. Expected {typeof(RabbitMQBinding).AssemblyQualifiedName}, Passed: {bindingElement.GetType().AssemblyQualifiedName}");
+            }
+
+            rabbitMqTransportBindingElement.HostName = this.HostName;
+            rabbitMqTransportBindingElement.Port = this.Port;
+            rabbitMqTransportBindingElement.ConnectionFactory.Password = this.Password;
+            rabbitMqTransportBindingElement.ConnectionFactory.UserName = this.Username;
+            rabbitMqTransportBindingElement.ConnectionFactory.VirtualHost = this.VirtualHost;
+        }
+
+        public override void CopyFrom(ServiceModelExtensionElement serviceModelExtensionElement)
+        {
+            base.CopyFrom(serviceModelExtensionElement);
+            if (serviceModelExtensionElement is RabbitMQTransportElement rabbitMqTransportElement)
+            {
+                this.HostName = rabbitMqTransportElement.HostName;
+                this.Port = rabbitMqTransportElement.Port;
+                this.Password = rabbitMqTransportElement.Password;
+                this.Username = rabbitMqTransportElement.Username;
+                this.VirtualHost = rabbitMqTransportElement.VirtualHost;
+            }
+        }
+
+        protected override void InitializeFrom(BindingElement bindingElement)
+        {
+            base.InitializeFrom(bindingElement);
+
+            if (bindingElement == null)
+            {
+                throw new ArgumentNullException(nameof(bindingElement));
+            }
+            if (!(bindingElement is RabbitMQTransportBindingElement rabbitMqTransportBindingElement))
+            {
+                throw new ArgumentException($"Invalid type for binding. Expected {typeof(RabbitMQBinding).AssemblyQualifiedName}, Passed: {bindingElement.GetType().AssemblyQualifiedName}");
+            }
+
+            this.HostName = rabbitMqTransportBindingElement.HostName;
+            this.Port = rabbitMqTransportBindingElement.Port;
+            this.Password = rabbitMqTransportBindingElement.ConnectionFactory.Password;
+            this.Username = rabbitMqTransportBindingElement.ConnectionFactory.UserName;
+            this.VirtualHost = rabbitMqTransportBindingElement.ConnectionFactory.VirtualHost;
+        }
+
+        protected override BindingElement CreateBindingElement()
+        {
+            TransportBindingElement transportBindingElement = this.CreateDefaultBindingElement();
+            this.ApplyConfiguration(transportBindingElement);
+
+            return transportBindingElement;
+        }
+
+        protected override TransportBindingElement CreateDefaultBindingElement()
+        {
+            return new RabbitMQTransportBindingElement();
+        }
+
+        #endregion
     }
 }

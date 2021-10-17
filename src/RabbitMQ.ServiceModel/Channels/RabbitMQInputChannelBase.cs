@@ -44,70 +44,82 @@ namespace RabbitMQ.ServiceModel
 {
     internal abstract class RabbitMQInputChannelBase : RabbitMQChannelBase, IInputChannel
     {
+        #region Fields and Constructors
+
         private readonly EndpointAddress _localAddress;
         private readonly Func<TimeSpan, Message> _receiveMethod;
         private readonly CommunicationOperation<bool, Message> _tryReceiveMethod;
         private readonly Func<TimeSpan, bool> _waitForMessage;
 
-        protected RabbitMQInputChannelBase(BindingContext context, EndpointAddress localAddress)
-            : base(context)
+        protected RabbitMQInputChannelBase(BindingContext bindingContext, EndpointAddress localAddress)
+            : base(bindingContext)
         {
-            _localAddress = localAddress;
-            _receiveMethod = Receive;
-            _tryReceiveMethod = TryReceive;
-            _waitForMessage = WaitForMessage;
+            this._localAddress = localAddress;
+            this._receiveMethod = this.Receive;
+            this._tryReceiveMethod = this.TryReceive;
+            this._waitForMessage = this.WaitForMessage;
         }
+
+        #endregion
+
+        #region Properties
 
         public EndpointAddress LocalAddress
         {
-            get { return _localAddress; }
+            get { return this._localAddress; }
         }
 
-        public virtual IAsyncResult BeginReceive(TimeSpan timeout, AsyncCallback callback, object state)
-        {
-            return _receiveMethod.BeginInvoke(timeout, callback, state);
-        }
+        #endregion
 
-        public virtual IAsyncResult BeginReceive(AsyncCallback callback, object state)
-        {
-            return _receiveMethod.BeginInvoke(Context.Binding.ReceiveTimeout, callback, state);
-        }
+        #region Methods
 
-        public virtual IAsyncResult BeginTryReceive(TimeSpan timeout, AsyncCallback callback, object state)
+        public virtual Message Receive()
         {
-            Message message;
-            return _tryReceiveMethod.BeginInvoke(timeout, out message, callback, state);
-        }
-
-        public virtual IAsyncResult BeginWaitForMessage(TimeSpan timeout, AsyncCallback callback, object state)
-        {
-            return _waitForMessage.BeginInvoke(timeout, callback, state);
-        }
-
-        public virtual Message EndReceive(IAsyncResult result)
-        {
-            return _receiveMethod.EndInvoke(result);
-        }
-
-        public virtual bool EndTryReceive(IAsyncResult result, out Message message)
-        {
-            return _tryReceiveMethod.EndInvoke(out message, result);
-        }
-
-        public virtual bool EndWaitForMessage(IAsyncResult result)
-        {
-            return _waitForMessage.EndInvoke(result);
+            return this.Receive(base.BindingContext.Binding.ReceiveTimeout);
         }
 
         public abstract Message Receive(TimeSpan timeout);
 
-        public virtual Message Receive()
+        public virtual IAsyncResult BeginReceive(AsyncCallback callback, object state)
         {
-            return Receive(Context.Binding.ReceiveTimeout);
+            return this._receiveMethod.BeginInvoke(base.BindingContext.Binding.ReceiveTimeout, callback, state);
+        }
+
+        public virtual IAsyncResult BeginReceive(TimeSpan timeout, AsyncCallback callback, object state)
+        {
+            return this._receiveMethod.BeginInvoke(timeout, callback, state);
         }
 
         public abstract bool TryReceive(TimeSpan timeout, out Message message);
 
+        public virtual IAsyncResult BeginTryReceive(TimeSpan timeout, AsyncCallback callback, object state)
+        {
+            Message message;
+            return this._tryReceiveMethod.BeginInvoke(timeout, out message, callback, state);
+        }
+
+        public virtual Message EndReceive(IAsyncResult result)
+        {
+            return this._receiveMethod.EndInvoke(result);
+        }
+
+        public virtual bool EndTryReceive(IAsyncResult result, out Message message)
+        {
+            return this._tryReceiveMethod.EndInvoke(out message, result);
+        }
+
         public abstract bool WaitForMessage(TimeSpan timeout);
+
+        public virtual IAsyncResult BeginWaitForMessage(TimeSpan timeout, AsyncCallback callback, object state)
+        {
+            return this._waitForMessage.BeginInvoke(timeout, callback, state);
+        }
+
+        public virtual bool EndWaitForMessage(IAsyncResult result)
+        {
+            return this._waitForMessage.EndInvoke(result);
+        }
+
+        #endregion
     }
 }

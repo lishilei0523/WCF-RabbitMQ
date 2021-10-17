@@ -40,5 +40,5 @@ using System;
 
 namespace RabbitMQ.ServiceModel
 {
-    internal delegate TResult CommunicationOperation<TResult, TArg>(TimeSpan timeout, out TArg arg0);
+    internal delegate TResult CommunicationOperation<out TResult, TArgument>(TimeSpan timeout, out TArgument argument);
 }

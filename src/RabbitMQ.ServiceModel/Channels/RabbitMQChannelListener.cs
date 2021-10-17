@@ -36,36 +36,44 @@
 
 #endregion
 
+using RabbitMQ.Client;
 using System;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
-using RabbitMQ.Client;
 
 namespace RabbitMQ.ServiceModel
 {
     internal sealed class RabbitMQChannelListener<TChannel> : RabbitMQChannelListenerBase<IInputChannel> where TChannel : class, IChannel
     {
+        #region Fields and Constructors
 
-        private IInputChannel m_channel;
-        private IModel m_model;
+        private IInputChannel _channel;
+        private IModel _model;
 
         internal RabbitMQChannelListener(BindingContext context)
             : base(context)
         {
-            m_channel = null;
-            m_model = null;
+            this._channel = null;
+            this._model = null;
         }
+
+        #endregion
+
+        #region Methods
 
         protected override IInputChannel OnAcceptChannel(TimeSpan timeout)
         {
             // Since only one connection to a broker is required (even for communication
             // with multiple exchanges
-            if (m_channel != null)
+            if (this._channel != null)
+            {
                 return null;
+            }
 
-            m_channel = new RabbitMQInputChannel(Context, m_model, new EndpointAddress(Uri.ToString()));
-            m_channel.Closed += new EventHandler(ListenChannelClosed);
-            return m_channel;
+            EndpointAddress endpointAddress = new EndpointAddress(base.Uri.ToString());
+            this._channel = new RabbitMQInputChannel(base.BindingContext, this._model, endpointAddress);
+            this._channel.Closed += this.ListenChannelClosed;
+            return this._channel;
         }
 
         protected override bool OnWaitForChannel(TimeSpan timeout)
@@ -79,7 +87,7 @@ namespace RabbitMQ.ServiceModel
 #if VERBOSE
             DebugHelper.Start();
 #endif
-            m_model = m_bindingElement.Open(timeout);
+            this._model = this._bindingElement.Open(timeout);
 #if VERBOSE
             DebugHelper.Stop(" ## In.Open {{Time={0}ms}}.");
 #endif
@@ -90,16 +98,16 @@ namespace RabbitMQ.ServiceModel
 #if VERBOSE
             DebugHelper.Start();
 #endif
-            if (m_channel != null)
+            if (this._channel != null)
             {
-                m_channel.Close();
-                m_channel = null;
+                this._channel.Close();
+                this._channel = null;
             }
 
-            if (m_model != null)
+            if (this._model != null)
             {
-                m_bindingElement.Close(m_model, timeout);
-                m_model = null;
+                base._bindingElement.Close(this._model, timeout);
+                this._model = null;
             }
 #if VERBOSE
             DebugHelper.Stop(" ## In.Close {{Time={0}ms}}.");
@@ -108,7 +116,9 @@ namespace RabbitMQ.ServiceModel
 
         private void ListenChannelClosed(object sender, EventArgs args)
         {
-            Close();
+            base.Close();
         }
+
+        #endregion
     }
 }

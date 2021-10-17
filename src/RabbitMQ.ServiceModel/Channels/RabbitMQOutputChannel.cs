@@ -44,65 +44,77 @@ using System.ServiceModel.Channels;
 
 namespace RabbitMQ.ServiceModel
 {
-    /// <summary>
-    /// 
-    /// </summary>
     internal sealed class RabbitMQOutputChannel : RabbitMQOutputChannelBase
     {
-        private RabbitMQTransportBindingElement m_bindingElement;
-        private MessageEncoder m_encoder;
-        private IModel m_model;
+        #region Fields and Constructors
 
-        public RabbitMQOutputChannel(BindingContext context, IModel model, EndpointAddress address)
-            : base(context, address)
+        private readonly RabbitMQTransportBindingElement _bindingElement;
+        private readonly IModel _model;
+        private readonly MessageEncoder _encoder;
+
+        public RabbitMQOutputChannel(BindingContext bindingContext, IModel model, EndpointAddress endpointAddress)
+            : base(bindingContext, endpointAddress)
         {
-            m_bindingElement = context.Binding.Elements.Find<RabbitMQTransportBindingElement>();
-            MessageEncodingBindingElement encoderElement = context.Binding.Elements.Find<MessageEncodingBindingElement>();
+            this._bindingElement = bindingContext.Binding.Elements.Find<RabbitMQTransportBindingElement>();
+            this._model = model;
+
+            MessageEncodingBindingElement encoderElement = bindingContext.Binding.Elements.Find<MessageEncodingBindingElement>();
             if (encoderElement != null)
             {
-                m_encoder = encoderElement.CreateMessageEncoderFactory().Encoder;
+                MessageEncoderFactory encoderFactory = encoderElement.CreateMessageEncoderFactory();
+                this._encoder = encoderFactory.Encoder;
             }
-            m_model = model;
+        }
+
+        #endregion
+
+        #region Methods
+
+        public override void Open(TimeSpan timeout)
+        {
+            if (base.State != CommunicationState.Created && base.State != CommunicationState.Closed)
+            {
+                throw new InvalidOperationException($"Cannot open the channel from the {base.State} state.");
+            }
+
+            base.OnOpening();
+            base.OnOpened();
         }
 
         public override void Send(Message message, TimeSpan timeout)
         {
             if (message.State != MessageState.Closed)
             {
-                byte[] body = null;
 #if VERBOSE
                 DebugHelper.Start();
 #endif
-                using (MemoryStream str = new MemoryStream())
+                byte[] body;
+                using (MemoryStream stream = new MemoryStream())
                 {
-                    m_encoder.WriteMessage(message, str);
-                    body = str.ToArray();
+                    this._encoder.WriteMessage(message, stream);
+                    body = stream.ToArray();
                 }
 #if VERBOSE
                 DebugHelper.Stop(" #### Message.Send {{\n\tAction={2}, \n\tBytes={1}, \n\tTime={0}ms}}.",
                     body.Length,
                     message.Headers.Action.Remove(0, message.Headers.Action.LastIndexOf('/')));
 #endif
-                m_model.BasicPublish(string.Empty, base.RemoteAddress.Uri.PathAndQuery, null, body);
+                this._model.BasicPublish(string.Empty, base.RemoteAddress.Uri.PathAndQuery, null, body);
             }
         }
 
         public override void Close(TimeSpan timeout)
         {
             if (base.State == CommunicationState.Closed || base.State == CommunicationState.Closing)
-                return; // Ignore the call, we're already closing.
+            {
+                // Ignore the call, we're already closing.
+                return;
+            }
 
-            OnClosing();
-            OnClosed();
+            this.OnClosing();
+            this.OnClosed();
         }
 
-        public override void Open(TimeSpan timeout)
-        {
-            if (base.State != CommunicationState.Created && base.State != CommunicationState.Closed)
-                throw new InvalidOperationException(string.Format("Cannot open the channel from the {0} state.", base.State));
-
-            OnOpening();
-            OnOpened();
-        }
+        #endregion
     }
 }

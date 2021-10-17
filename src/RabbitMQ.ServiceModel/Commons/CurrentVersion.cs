@@ -36,11 +36,6 @@
 
 #endregion
 
-using System;
-using System.Text;
-
-using RabbitMQ.Client;
-
 namespace RabbitMQ.ServiceModel
 {
     /// <summary>
@@ -48,15 +43,6 @@ namespace RabbitMQ.ServiceModel
     /// </summary>
     public static class CurrentVersion
     {
-        internal const String Scheme = "soap.amqp";
-
-        internal static Encoding DefaultEncoding { get { return Encoding.UTF8; } }
-
-        internal static class StatusCodes
-        {
-            //TODO RabbitMQ.Cient 6.2.2 change Constants namespace
-            public const int Ok = Constants.ReplySuccess;
-        }
-
+        internal const string Scheme = "soap.amqp";
     }
 }

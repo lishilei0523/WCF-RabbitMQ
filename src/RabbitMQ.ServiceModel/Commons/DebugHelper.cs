@@ -43,46 +43,52 @@ namespace RabbitMQ.ServiceModel
 {
     public static class DebugHelper
     {
-        static long m_started;
+        #region Fields and Constructors
+
+        private static long _Started;
 
         static DebugHelper()
         {
             Timer = new Stopwatch();
         }
 
+        #endregion
+
+        #region Properties
+
+        public static Stopwatch Timer { get; set; }
+
+        public static bool Enabled { get; set; }
+
+        #endregion
+
+        #region Methods
+
         public static void Start()
         {
-            m_started = Timer.ElapsedMilliseconds;
+            _Started = Timer.ElapsedMilliseconds;
             Timer.Start();
         }
 
-        public static void Stop(string messageFormat, params object[] args)
+        public static void Stop(string messageFormat, params object[] parameters)
         {
             Timer.Stop();
 
             if (Enabled)
             {
-                object[] args1 = new object[args.Length + 1];
-                args.CopyTo(args1, 1);
-                args1[0] = Timer.ElapsedMilliseconds - m_started;
+                object[] arguments = new object[parameters.Length + 1];
+                parameters.CopyTo(arguments, 1);
+                arguments[0] = Timer.ElapsedMilliseconds - _Started;
+
                 if (Console.CursorLeft != 0)
+                {
                     Console.WriteLine();
-                Console.WriteLine(messageFormat, args1);
+                }
+
+                Console.WriteLine(messageFormat, arguments);
             }
         }
 
-        private static Stopwatch timer;
-        public static Stopwatch Timer
-        {
-            get { return timer; }
-            set { timer = value; }
-        }
-
-        private static bool enabled;
-        public static bool Enabled
-        {
-            get { return enabled; }
-            set { enabled = value; }
-        }
+        #endregion
     }
 }
