@@ -52,7 +52,6 @@ namespace RabbitMQ.ServiceModel
     /// </summary>
     internal sealed class RabbitMQInputChannel : RabbitMQInputChannelBase
     {
-        private static readonly object _Sync = new object();
         private RabbitMQTransportBindingElement m_bindingElement;
         private MessageEncoder m_encoder;
         private IModel m_model;
@@ -153,15 +152,10 @@ namespace RabbitMQ.ServiceModel
 #if VERBOSE
             DebugHelper.Start();
 #endif
-            //TODO Powered by Lee, add lock
-            lock (_Sync)
-            {
-                QueueDeclareOk queue = m_model.QueueDeclare(base.LocalAddress.Uri.PathAndQuery, true, false, true, null);
-                m_consumer = new EventingBasicConsumer(m_model);
-                m_consumer.Received += (sender, args) => m_queue.Add(args);
-                m_model.BasicConsume(queue, false, m_consumer);
-            }
-
+            QueueDeclareOk queue = m_model.QueueDeclare(base.LocalAddress.Uri.PathAndQuery, true, false, true, null);
+            m_consumer = new EventingBasicConsumer(m_model);
+            m_consumer.Received += (sender, args) => m_queue.Add(args);
+            m_model.BasicConsume(queue, false, m_consumer);
 #if VERBOSE
             DebugHelper.Stop(" ## In.Channel.Open {{\n\tAddress={1}, \n\tTime={0}ms}}.", LocalAddress.Uri.PathAndQuery);
 #endif

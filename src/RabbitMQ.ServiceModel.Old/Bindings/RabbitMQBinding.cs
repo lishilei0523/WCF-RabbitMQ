@@ -39,7 +39,6 @@
 using RabbitMQ.Client;
 using System;
 using System.Configuration;
-using System.ServiceModel;
 using System.ServiceModel.Channels;
 
 namespace RabbitMQ.ServiceModel
@@ -57,7 +56,6 @@ namespace RabbitMQ.ServiceModel
         private TextMessageEncodingBindingElement m_encoding;
         private bool m_isInitialized;
         private bool m_oneWayOnly;
-        private ReliableSessionBindingElement m_session;
         private TransactionFlowBindingElement m_transactionFlow;
         private bool m_transactionsEnabled;
         private RabbitMQTransportBindingElement m_transport;
@@ -151,8 +149,7 @@ namespace RabbitMQ.ServiceModel
             }
             if (!OneWayOnly)
             {
-                //TODO Powered by Lee, close ReliableSession
-                //elements.Add(m_session);
+                //TODO Powered by Lee, remove ReliableSession
                 elements.Add(m_compositeDuplex);
             }
             elements.Add(m_encoding);
@@ -168,8 +165,7 @@ namespace RabbitMQ.ServiceModel
                 if (!m_isInitialized)
                 {
                     m_transport = new RabbitMQTransportBindingElement();
-                    m_encoding = new TextMessageEncodingBindingElement(); // new TextMessageEncodingBindingElement();
-                    m_session = new ReliableSessionBindingElement(false);
+                    m_encoding = new TextMessageEncodingBindingElement();
                     m_compositeDuplex = new CompositeDuplexBindingElement();
                     m_transactionFlow = new TransactionFlowBindingElement();
                     m_maxMessageSize = DefaultMaxMessageSize;
@@ -231,14 +227,6 @@ namespace RabbitMQ.ServiceModel
         public RabbitMQTransportBindingElement Transport
         {
             get { return m_transport; }
-        }
-
-        /// <summary>
-        /// Gets the reliable session parameters for this binding instance
-        /// </summary>
-        public ReliableSession ReliableSession
-        {
-            get { return new ReliableSession(m_session); }
         }
 
         /// <summary>

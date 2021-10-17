@@ -2,12 +2,13 @@
 using System;
 using System.Diagnostics;
 using System.ServiceModel;
+using System.Threading.Tasks;
 
 namespace RabbitMQ.WCF.Client
 {
     class Program
     {
-        static void Main()
+        static async Task Main()
         {
             //Console.WriteLine("商品部分");
 
@@ -39,12 +40,21 @@ namespace RabbitMQ.WCF.Client
             Stopwatch watch = new Stopwatch();
             watch.Start();
 
+            //Parallel.For(0, 10, index =>
+            //{
+            //    IOrderService orderService = orderSvcFactory.CreateChannel();
+
+            //    string orderNo = $"编号{index:D3}";
+            //    string result = orderService.CreateOrder(orderNo);
+            //    Console.WriteLine(result);
+            //});
+
             for (int index = 1; index <= 100; index++)
             {
                 IOrderService orderService = orderSvcFactory.CreateChannel();
 
                 string orderNo = $"编号{index:D3}";
-                string result = orderService.CreateOrder(orderNo);
+                string result = await Task.Run(() => orderService.CreateOrder(orderNo));
                 Console.WriteLine(result);
             }
 
