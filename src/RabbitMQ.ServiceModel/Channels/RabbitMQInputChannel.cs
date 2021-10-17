@@ -1,3 +1,5 @@
+#region License
+
 // This source code is dual-licensed under the Apache License, version
 // 2.0, and the Mozilla Public License, version 1.1.
 //
@@ -30,34 +32,30 @@
 //  Software distributed under the License is distributed on an "AS IS"
 //  basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See
 //  the License for the specific language governing rights and
-//  limitations under the License.
-//
-//  The Original Code is RabbitMQ.
-//
-//  The Initial Developer of the Original Code is Pivotal Software, Inc.
-//  Copyright (c) 2007-2016 Pivotal Software, Inc.  All rights reserved.
-//---------------------------------------------------------------------------
+//  limitations under the License. 
 
+#endregion
+
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 using System;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.IO;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
-using RabbitMQ.Client.Framing;
-
 namespace RabbitMQ.ServiceModel
 {
+    /// <summary>
+    /// 
+    /// </summary>
     internal sealed class RabbitMQInputChannel : RabbitMQInputChannelBase
     {
         private RabbitMQTransportBindingElement m_bindingElement;
         private MessageEncoder m_encoder;
         private IModel m_model;
         private EventingBasicConsumer m_consumer;
-        private BlockingCollection<BasicDeliverEventArgs> m_queue = 
+        private BlockingCollection<BasicDeliverEventArgs> m_queue =
             new BlockingCollection<BasicDeliverEventArgs>(new ConcurrentQueue<BasicDeliverEventArgs>());
 
         public RabbitMQInputChannel(BindingContext context, IModel model, EndpointAddress address)
@@ -66,7 +64,8 @@ namespace RabbitMQ.ServiceModel
             m_bindingElement = context.Binding.Elements.Find<RabbitMQTransportBindingElement>();
             TextMessageEncodingBindingElement encoderElem = context.BindingParameters.Find<TextMessageEncodingBindingElement>();
             encoderElem.ReaderQuotas.MaxStringContentLength = (int)m_bindingElement.MaxReceivedMessageSize;
-            if (encoderElem != null) {
+            if (encoderElem != null)
+            {
                 m_encoder = encoderElem.CreateMessageEncoderFactory().Encoder;
             }
             m_model = model;
@@ -95,7 +94,7 @@ namespace RabbitMQ.ServiceModel
             }
             catch (EndOfStreamException)
             {
-                if (m_consumer== null || m_consumer.ShutdownReason != null && m_consumer.ShutdownReason.ReplyCode != Constants.ReplySuccess)
+                if (m_consumer == null || m_consumer.ShutdownReason != null && m_consumer.ShutdownReason.ReplyCode != Constants.ReplySuccess)
                 {
                     OnFaulted();
                 }
@@ -128,7 +127,8 @@ namespace RabbitMQ.ServiceModel
 #if VERBOSE
             DebugHelper.Start();
 #endif
-            if (m_consumer != null) {
+            if (m_consumer != null)
+            {
                 //TODO RabbitMQ.Cient 6.2.2 turn ConsumerTag to ConsumerTags
                 foreach (string consumerTag in m_consumer.ConsumerTags)
                 {
@@ -151,11 +151,7 @@ namespace RabbitMQ.ServiceModel
 #if VERBOSE
             DebugHelper.Start();
 #endif
-            //Create a queue for messages destined to this service, bind it to the service URI routing key
-            string queue = m_model.QueueDeclare();
-            m_model.QueueBind(queue, Exchange, base.LocalAddress.Uri.PathAndQuery, null);
-
-            //Listen to the queue
+            QueueDeclareOk queue = m_model.QueueDeclare(base.LocalAddress.Uri.PathAndQuery, true, false, true, null);
             m_consumer = new EventingBasicConsumer(m_model);
             m_consumer.Received += (sender, args) => m_queue.Add(args);
             m_model.BasicConsume(queue, false, m_consumer);

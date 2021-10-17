@@ -40,23 +40,23 @@ namespace RabbitMQ.WCF.Client
             Stopwatch watch = new Stopwatch();
             watch.Start();
 
-            //Parallel.For(0, 10, index =>
-            //{
-            //    IOrderService orderService = orderSvcFactory.CreateChannel();
-
-            //    string orderNo = $"编号{index:D3}";
-            //    string result = orderService.CreateOrder(orderNo);
-            //    Console.WriteLine(result);
-            //});
-
-            for (int index = 1; index <= 100; index++)
+            Parallel.For(0, 10, index =>
             {
                 IOrderService orderService = orderSvcFactory.CreateChannel();
 
                 string orderNo = $"编号{index:D3}";
-                string result = await Task.Run(() => orderService.CreateOrder(orderNo));
+                string result = orderService.CreateOrder(orderNo);
                 Console.WriteLine(result);
-            }
+            });
+
+            //for (int index = 1; index <= 100; index++)
+            //{
+            //    IOrderService orderService = orderSvcFactory.CreateChannel();
+
+            //    string orderNo = $"编号{index:D3}";
+            //    string result = await Task.Run(() => orderService.CreateOrder(orderNo));
+            //    Console.WriteLine(result);
+            //}
 
             watch.Stop();
 
