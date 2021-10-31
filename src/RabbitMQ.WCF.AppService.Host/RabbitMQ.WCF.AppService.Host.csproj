@@ -7,6 +7,10 @@
     <Copyright>Copyright © SD 2021</Copyright>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Platform)'=='AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
   <ItemGroup>
     <Reference Include="System.ServiceModel" />
   </ItemGroup>
