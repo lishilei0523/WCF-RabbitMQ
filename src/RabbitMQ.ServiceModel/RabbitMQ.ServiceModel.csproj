@@ -9,7 +9,7 @@
       RabbitMQ Binding for Windows Communication Foundation.
       Release Notes:
         1. Remove ReliableSession to allow multiple instances;
-        2. Update RabbitMQ.Client to 6.2.2;
+        2. Update RabbitMQ.Client to 6.2.4;
     </Description>
     <Copyright>Copyright © 2007-2021 Pivotal Software, Inc.</Copyright>
   </PropertyGroup>
@@ -27,6 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="RabbitMQ.Client" Version="6.2.2" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.2.4" />
   </ItemGroup>
 </Project>
